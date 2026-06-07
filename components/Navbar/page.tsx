@@ -17,10 +17,7 @@ export default function Navbar({ name, role }: NavbarProps) {
 
   const handleLogout = async () => {
     try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/logout`,
-        { withCredentials: true },
-      );
+      const res = await axios.get("/api/auth/logout");
       if (res.status !== 200) throw new Error(res.data.message);
       toast.success("Logged out successfully");
       router.push("/login");

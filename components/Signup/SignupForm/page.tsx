@@ -32,18 +32,13 @@ export default function SignupForm() {
 
   const onSubmit = async (data: SignupFormData) => {
     try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/signup`,
-        data,
-        { withCredentials: true },
-      );
+      const res = await axios.post("/api/auth/signup", data);
       if (res.status !== 201) throw new Error(res.data.message);
       toast.success("Signup successful!", {
         description: "Redirecting to Home Page...",
       });
-      setTimeout(() => {
-        router.push("/");
-      }, 1500);
+      router.refresh();
+      router.replace("/");
     } catch (e: any) {
       if (axios.isAxiosError(e)) {
         console.log(e.response?.data?.message);

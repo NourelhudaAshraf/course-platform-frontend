@@ -34,23 +34,16 @@ export default function LoginForm() {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/login`,
-        data,
-        { withCredentials: true },
-      );
+      const res = await axios.post("/api/auth/login", data);
       if (res.status !== 201) throw new Error(res.data.message);
+      const isAdmin = res.data.data.role === "admin";
       toast.success("Login successful!", {
-        description:
-          res.data.data.role === "admin"
-            ? "Redirecting to Dashboard..."
-            : "Redirecting to Home Page...",
+        description: isAdmin
+          ? "Redirecting to Dashboard..."
+          : "Redirecting to Home Page...",
       });
-      setTimeout(() => {
-        if (res.data.data.role === "admin") router.push("/admin");
-        else router.push("/");
-        router.refresh();
-      }, 1500);
+      router.refresh();
+      router.replace(isAdmin ? "/admin" : "/");
     } catch (e: any) {
       if (axios.isAxiosError(e)) {
         console.log(e.response?.data?.message);
