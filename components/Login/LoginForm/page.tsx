@@ -49,6 +49,7 @@ export default function LoginForm() {
       setTimeout(() => {
         if (res.data.data.role === "admin") router.push("/admin");
         else router.push("/");
+        router.refresh();
       }, 1500);
     } catch (e: any) {
       if (axios.isAxiosError(e)) {
@@ -64,8 +65,6 @@ export default function LoginForm() {
           description: (e.message as string) || "Something went wrong!",
         });
       }
-    } finally {
-      router.refresh();
     }
   };
 
