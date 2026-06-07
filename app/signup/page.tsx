@@ -1,7 +1,5 @@
-export default function SignUp() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      SignUp
-    </div>
-  );
+import Signup from "@/components/Signup/page";
+
+export default function SignupPage() {
+  return <Signup />;
 }
