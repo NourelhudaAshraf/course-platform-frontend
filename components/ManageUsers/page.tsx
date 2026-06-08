@@ -159,6 +159,7 @@ export default function ManageUsersPage() {
     {
       key: "createdAt",
       title: "Created",
+      minWidth: 150,
       render: (user) => (
         <span className="text-gray-500">{formatDate(user.createdAt)}</span>
       ),

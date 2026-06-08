@@ -196,6 +196,7 @@ export type NavLinkProps = {
   readonly name: string;
   readonly href: string;
   readonly requiresAuth?: boolean;
+  readonly hidden?: boolean;
 };
 
 export type MobileMenuProps = {
@@ -285,6 +286,7 @@ export type Column<T = any> = {
   readonly render?: (item: T) => ReactNode;
   readonly className?: string;
   readonly align?: "left" | "right" | "center";
+  readonly minWidth?: number;
 };
 
 export type SharedDataTableProps<T = any> = {

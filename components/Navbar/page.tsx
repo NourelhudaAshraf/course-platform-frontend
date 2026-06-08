@@ -35,6 +35,12 @@ export default function Navbar({ name, role }: NavbarProps) {
     // { name: "Courses", href: "#courses" },
   ];
 
+  const mobileNavLinks = [
+    ...navLinks,
+    { name: "My Courses", href: "/my-courses", hidden: role !== "user" },
+    { name: "Profile", href: "/profile" },
+  ];
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -116,7 +122,7 @@ export default function Navbar({ name, role }: NavbarProps) {
         <MobileMenu
           name={name}
           handleLogout={handleLogout}
-          navLinks={navLinks}
+          navLinks={mobileNavLinks}
           setIsMobileMenuOpen={setIsMobileMenuOpen}
           pathname={pathname}
           role={role}

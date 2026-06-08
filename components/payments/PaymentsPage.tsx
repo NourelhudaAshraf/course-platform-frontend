@@ -36,6 +36,7 @@ export default function PaymentsPage() {
     {
       key: "user",
       title: "User",
+      minWidth: 150,
       render: (payment) => (
         <span className="font-medium">{payment.user.name}</span>
       ),
@@ -43,7 +44,9 @@ export default function PaymentsPage() {
     {
       key: "course",
       title: "Course",
-      render: (payment) => payment.course.title,
+      render: (payment) => (
+        <span className="font-medium truncate">{payment.course.title}</span>
+      ),
     },
     {
       key: "price",
@@ -53,14 +56,15 @@ export default function PaymentsPage() {
     {
       key: "createdAt",
       title: "Payment Date",
+      minWidth: 150,
       render: (payment) => formatDate(payment.createdAt),
     },
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6 mt-5 md:mt-0">
       <PageHeader
-        title="Payments"
+        title="Manage Payments"
         description="View all course enrollments and payments"
       />
       <SharedTable

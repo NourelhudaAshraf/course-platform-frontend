@@ -89,6 +89,7 @@ export function SharedTable<T>({
                         key={column.key}
                         className={`
                         py-3 px-4
+                        ${column.minWidth ? `min-w-[${column.minWidth}px]` : ""}
                         ${column.align === "right" ? "text-right" : column.align === "center" ? "text-center" : "text-left"}
                         ${column.className || ""}
                       `}

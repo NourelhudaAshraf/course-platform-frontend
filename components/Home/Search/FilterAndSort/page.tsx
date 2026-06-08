@@ -15,8 +15,8 @@ export default function FilterAndSort({
   setSortBy,
 }: FilterAndSortProps) {
   return (
-    <div className="flex flex-wrap justify-between items-center gap-3 mt-4">
-      <div className="flex justify-between items-center mt-4">
+    <div className="flex flex-col-reverse items-end sm:flex-row sm:justify-between sm:items-center gap-3 mt-4 ">
+      <div className="flex justify-between items-center">
         <Button
           variant="ghost"
           onClick={() => setShowFilters(!showFilters)}

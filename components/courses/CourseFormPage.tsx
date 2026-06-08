@@ -55,7 +55,9 @@ export function CourseFormPage({ courseId }: CourseFormPageProps) {
         router.push(`/admin/courses/${course._id}/lessons`);
       }
     } catch {
-      toast.error(isEdit ? "Failed to update course" : "Failed to create course");
+      toast.error(
+        isEdit ? "Failed to update course" : "Failed to create course",
+      );
     } finally {
       setLoading(false);
     }
@@ -71,13 +73,11 @@ export function CourseFormPage({ courseId }: CourseFormPageProps) {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6 mt-5 md:mt-0">
       <PageHeader
         title={isEdit ? "Edit Course" : "Create Course"}
         description={
-          isEdit
-            ? "Update course details"
-            : "Add a new course to your platform"
+          isEdit ? "Update course details" : "Add a new course to your platform"
         }
       />
       <CourseForm

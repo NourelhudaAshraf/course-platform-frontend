@@ -58,7 +58,7 @@ export default function SignupForm() {
     }
   };
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black min-h-dvh">
+    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black min-h-dvh px-4">
       <Card className="w-full max-w-md mx-auto py-4">
         <CardHeader>
           <CardTitle className="font-bold text-2xl bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -128,7 +128,7 @@ export default function SignupForm() {
             </div>
           </CardContent>
 
-          <CardFooter className="mt-4">
+          <CardFooter className="mt-4 flex flex-col gap-3">
             <Button
               type="submit"
               className="w-1/2 mx-auto bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
@@ -136,6 +136,12 @@ export default function SignupForm() {
             >
               {isSubmitting ? "Creating account..." : "Sign Up"}
             </Button>
+            <p className="text-sm text-center text-gray-600">
+              {"Already have an account? "}
+              <a href="/login" className="text-blue-600 hover:underline">
+                Login
+              </a>
+            </p>
           </CardFooter>
         </form>
       </Card>

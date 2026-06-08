@@ -17,19 +17,19 @@ export default function RecentUsers({ users, loading }: RecentUsersProps) {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div>
+        <div>
+          <div className="flex items-center justify-between w-full gap-2">
             <CardTitle>Recent Users</CardTitle>
-            <CardDescription>
-              Latest registered users on the platform
-            </CardDescription>
+            <Link href="/admin/users">
+              <Button variant="ghost" size="sm">
+                View All
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
           </div>
-          <Link href="/admin/users">
-            <Button variant="ghost" size="sm">
-              View All
-              <ArrowRight className="h-4 w-4 ml-1" />
-            </Button>
-          </Link>
+          <CardDescription>
+            Latest registered users on the platform
+          </CardDescription>
         </div>
       </CardHeader>
       <CardContent>
@@ -45,7 +45,7 @@ export default function RecentUsers({ users, loading }: RecentUsersProps) {
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
                     Email
                   </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
+                  <th className="text-left py-3 px-4 min-w-32 text-sm font-medium text-gray-500">
                     Joined Date
                   </th>
                   <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">
@@ -59,7 +59,7 @@ export default function RecentUsers({ users, loading }: RecentUsersProps) {
                     key={user._id}
                     className="border-b border-gray-100 hover:bg-gray-50 transition"
                   >
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-4 min-w-40">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="bg-linear-to-r from-blue-500 to-purple-500 text-white text-xs">

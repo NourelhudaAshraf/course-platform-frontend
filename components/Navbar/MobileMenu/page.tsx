@@ -14,6 +14,7 @@ export default function MobileMenu({
       <div className="px-4 py-3 space-y-1">
         {navLinks.map((link) => {
           if (link.requiresAuth && role !== "admin") return null;
+          if (link.hidden) return null;
           return (
             <Link
               key={link.name}

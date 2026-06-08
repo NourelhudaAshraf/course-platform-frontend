@@ -60,8 +60,8 @@ export default function SearchSection({ getCourses }: SearchSectionProps) {
   };
 
   return (
-    <section className="w-full py-12 px-4 bg-linear-to-br from-blue-50 via-white to-purple-50">
-      <div className="max-w-4xl mx-auto" style={{ width: "75%" }}>
+    <section className="w-full py-12 px-0 sm:px-4 bg-linear-to-br from-blue-50 via-white to-purple-50">
+      <div className="mx-auto w-[90%] sm:w-[75%]">
         {/* Title */}
         <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">

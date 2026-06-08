@@ -169,7 +169,7 @@ export function LessonsManager({ courseId }: LessonsManagerProps) {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6 mt-5 md:mt-0">
       <PageHeader
         title={`Lessons — ${course?.title || "Course"}`}
         description="Add, edit, and manage course lessons"

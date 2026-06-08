@@ -45,36 +45,28 @@ export default function MyCourses() {
   };
   return (
     <div className="relative min-h-dvh bg-linear-to-br from-blue-50 via-white to-purple-50 overflow-hidden">
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
-        {/* Header Top Section */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
-          {/* Title Section */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Badge className="bg-blue-400/20 text-blue-600 border-blue-400/30 backdrop-blur-sm">
-                <Sparkles className="h-4 w-4 mr-1" />
-                My Learning Space
-              </Badge>
-            </div>
-            <h1 className="text-3xl md:text-4xl font-bold bg-linear-to-r from-blue-600  to-purple-600 bg-clip-text text-transparent mb-3">
+      <div className="relative max-w-7xl mx-auto sm:px-6 lg:px-8 py-10 lg:py-14">
+        {/* Title Section */}
+        <div className="space-y-3 mb-3 px-2 sm:ps-4">
+          <div className="flex items-start justify-between w-full gap-2 flex-wrap">
+            <h1 className="text-2xl md:text-4xl font-bold bg-linear-to-r from-blue-600  to-purple-600 bg-clip-text text-transparent">
               Welcome back!
             </h1>
-            <p className="text-gray-600 text-base max-w-2xl">
-              Track your progress and continue your learning journey
-            </p>
+            {/* Browse More Courses Button */}
+            <Button
+              variant="secondary"
+              className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white ms-auto mt-0.5"
+              asChild
+            >
+              <Link href="/" className="flex items-center gap-0.5!">
+                Explore More
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+            </Button>
           </div>
-
-          {/* Browse More Courses Button */}
-          <Button
-            variant="secondary"
-            className="absolute right-1 transform bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-            asChild
-          >
-            <Link href="/">
-              Explore New Courses
-              <ChevronRight className="h-4 w-4 ml-2" />
-            </Link>
-          </Button>
+          <p className="text-gray-600 text-base max-w-2xl">
+            Track your progress and continue your learning journey
+          </p>
         </div>
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 py-4 px-2">

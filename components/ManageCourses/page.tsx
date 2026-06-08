@@ -156,6 +156,7 @@ export default function ManageCoursesPage() {
     {
       key: "createdAt",
       title: "Created",
+      minWidth: 150,
       render: (course) => (
         <span className="text-gray-500">{formatDate(course.createdAt)}</span>
       ),
