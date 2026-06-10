@@ -10,16 +10,20 @@ export async function middleware(req: NextRequest) {
     if (!token) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
-    try {
-      const data = await getCurrentUser();
-      if (data.role !== "admin") {
-        return NextResponse.redirect(new URL("/", req.url));
-      }
-      return NextResponse.next();
-    } catch (err) {
+    const data = await getCurrentUser();
+    if (data?.role !== "admin") {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+    return NextResponse.next();
+  }
+  if (req.nextUrl.pathname.startsWith("/my-courses")) {
+    if (!token) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
+    const data = await getCurrentUser();
+    if (data?.role !== "user") {
+      return NextResponse.redirect(new URL("/admin", req.url));
+    }
   }
-
   return NextResponse.next();
 }

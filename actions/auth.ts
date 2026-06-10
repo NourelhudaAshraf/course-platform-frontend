@@ -6,6 +6,9 @@ import axios from "axios";
 export async function getCurrentUser() {
   try {
     const headers = await getToken();
+    if (!("headers" in headers)) {
+      return null;
+    }
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/me`,
       {

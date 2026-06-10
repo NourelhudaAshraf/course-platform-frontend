@@ -70,7 +70,7 @@ export default function CourseCard({
 
       <CardContent className="pb-3">
         {/* Short Description (trimmed) */}
-        <p className="text-gray-600 text-sm leading-relaxed line-clamp-2 max-h-[50px]">
+        <p className="text-gray-600 text-sm leading-relaxed line-clamp-2 h-[45px]">
           {trimmedDescription}
         </p>
       </CardContent>

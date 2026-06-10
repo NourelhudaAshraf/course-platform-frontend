@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ImageIcon, Loader2, Save } from "lucide-react";
+import { ImageIcon, Loader2, Save, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,21 +15,33 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CourseFormComponentProps } from "@/lib/types";
-import { courseSchema, CourseFormData } from "@/lib/schemas/course.schema";
+import {
+  courseSchema,
+  CourseFormData,
+  CourseFormSubmitData,
+} from "@/lib/schemas/course.schema";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
+const ACCEPTED_IMAGE_TYPES = "image/jpeg,image/png,image/webp,image/gif";
+
 export function CourseForm({
   defaultValues,
+  existingImageUrl,
+  isEdit = false,
   onSubmit,
   loading = false,
   submitLabel = "Save Course",
 }: CourseFormComponentProps) {
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const {
     register,
     handleSubmit,
     reset,
-    control,
     formState: { errors },
   } = useForm<CourseFormData>({
     resolver: zodResolver(courseSchema),
@@ -37,15 +49,65 @@ export function CourseForm({
       title: "",
       description: "",
       price: 0,
-      image: "",
     },
   });
-
-  const imageUrl = (useWatch({ control, name: "image" }) ?? "").trim();
 
   useEffect(() => {
     if (defaultValues) reset(defaultValues);
   }, [defaultValues, reset]);
+
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl?.startsWith("blob:")) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setImageError(null);
+
+    if (imagePreviewUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(imagePreviewUrl);
+    }
+
+    if (!file) {
+      setImageFile(null);
+      setImagePreviewUrl(
+        isEdit && existingImageUrl ? existingImageUrl : null,
+      );
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setImageError("Please select a valid image file");
+      setImageFile(null);
+      setImagePreviewUrl(
+        isEdit && existingImageUrl ? existingImageUrl : null,
+      );
+      return;
+    }
+
+    setImageFile(file);
+    setImagePreviewUrl(URL.createObjectURL(file));
+  };
+
+  const handleFormSubmit = async (data: CourseFormData) => {
+    if (!isEdit && !imageFile) {
+      setImageError("Please upload an image");
+      return;
+    }
+
+    const payload: CourseFormSubmitData = {
+      ...data,
+      ...(imageFile ? { image: imageFile } : {}),
+    };
+    await onSubmit(payload);
+  };
+
+  const previewSrc =
+    imagePreviewUrl ?? (isEdit && existingImageUrl ? existingImageUrl : null);
 
   return (
     <Card className="rounded-xl">
@@ -53,7 +115,7 @@ export function CourseForm({
         <CardTitle>Course Details</CardTitle>
         <CardDescription>Fill in the course information below</CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(handleFormSubmit)}>
         <CardContent className="space-y-6">
           <FormField
             id="title"
@@ -105,16 +167,29 @@ export function CourseForm({
           <div className="space-y-3">
             <FormField
               id="image"
-              label="Image URL"
-              error={errors.image?.message}
-              required
+              label={isEdit ? "Replace image (optional)" : "Course image"}
+              error={imageError ?? undefined}
+              required={!isEdit}
             >
-              <Input
+              <input
+                ref={fileInputRef}
                 id="image"
-                placeholder="https://example.com/image.jpg"
-                {...register("image")}
+                type="file"
+                accept={ACCEPTED_IMAGE_TYPES}
+                className="hidden"
+                onChange={handleImageChange}
                 disabled={loading}
               />
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                disabled={loading}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                {imageFile ? imageFile.name : "Choose image from your device"}
+              </Button>
             </FormField>
 
             <div className="rounded-lg border border-dashed border-gray-200 bg-gray-50/80 p-4">
@@ -122,7 +197,7 @@ export function CourseForm({
                 Preview
               </p>
               <div className="relative mx-auto aspect-video w-full max-w-sm overflow-hidden rounded-lg border bg-white shadow-sm">
-                <CourseImagePreview key={imageUrl} url={imageUrl} />
+                <CourseImagePreview key={previewSrc} src={previewSrc} />
               </div>
             </div>
           </div>
@@ -149,38 +224,18 @@ export function CourseForm({
   );
 }
 
-function isValidImageUrl(url: string) {
-  if (!url) return false;
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function getPreviewPlaceholderMessage(url: string, loadFailed: boolean) {
-  if (loadFailed) {
-    return "Could not load image. Check the URL and try again.";
-  }
-  if (url && !isValidImageUrl(url)) {
-    return "Enter a valid URL (e.g. https://…)";
-  }
-  return "Enter an image URL above to see a preview";
-}
-
-function CourseImagePreview({ url }: { readonly url: string }) {
+function CourseImagePreview({ src }: { readonly src: string | null }) {
   const [loadFailed, setLoadFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
-  const canPreview = isValidImageUrl(url) && !loadFailed;
-
-  if (!canPreview) {
+  if (!src || loadFailed) {
     return (
       <div className="flex h-full min-h-[140px] flex-col items-center justify-center gap-2 px-4 text-center text-gray-400">
         <ImageIcon className="h-10 w-10 stroke-[1.5]" />
         <p className="text-sm">
-          {getPreviewPlaceholderMessage(url, loadFailed)}
+          {loadFailed
+            ? "Could not load image. Try another file."
+            : "Upload an image to see a preview"}
         </p>
       </div>
     );
@@ -191,7 +246,7 @@ function CourseImagePreview({ url }: { readonly url: string }) {
       {!loaded && <Skeleton className="absolute inset-0 h-full w-full" />}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={url}
+        src={src}
         alt="Course preview"
         className={cn(
           "h-full w-full object-cover transition-opacity duration-300",

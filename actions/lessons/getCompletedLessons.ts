@@ -62,6 +62,7 @@ export async function getUserLessonsForCourse(
   courseId: string,
 ): Promise<Record<string, UserLessonSummary>> {
   const headers = await getToken();
+  console.log("headers", headers);
   if (!("headers" in headers)) return {};
 
   try {

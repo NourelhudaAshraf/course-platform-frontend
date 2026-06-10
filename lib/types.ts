@@ -82,10 +82,11 @@ export type CourseFormComponentProps = {
     title: string;
     description: string;
     price: number;
-    image: string;
   };
+  readonly existingImageUrl?: string;
+  readonly isEdit?: boolean;
   readonly onSubmit: (
-    data: import("./schemas/course.schema").CourseFormData,
+    data: import("./schemas/course.schema").CourseFormSubmitData,
   ) => Promise<void>;
   readonly loading?: boolean;
   readonly submitLabel?: string;

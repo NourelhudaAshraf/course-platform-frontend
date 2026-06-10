@@ -5,7 +5,9 @@ import axios from "axios";
 
 export default async function enrollFromAPI(id: string) {
   const headers = await getToken();
-  console.log("headers: ", headers);
+  if (!("headers" in headers)) {
+    throw new Error("Please login to enroll in a course");
+  }
   try {
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/api/v1/enrollment/checkout-session/${id}`,
@@ -24,6 +26,7 @@ export default async function enrollFromAPI(id: string) {
 
 export async function getEnrolledCourses() {
   const headers = await getToken();
+  if (!("headers" in headers)) return null;
   try {
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/api/v1/enrollment/my-courses/`,
@@ -44,7 +47,7 @@ export async function getEnrolledCourses() {
 
 export async function checkIsCourseEnrolled(id: string) {
   const headers = await getToken();
-  console.log("======", headers);
+  if (!("headers" in headers)) return null;
   try {
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/api/v1/enrollment/${id}`,
