@@ -1,13 +1,19 @@
 "use server";
 
 import { LIMIT } from "@/lib/constants";
+import {
+  ActionResult,
+  fail,
+  getAxiosErrorMessage,
+  ok,
+} from "@/lib/actionResult";
 import { SearchData } from "@/lib/types";
 import axios from "axios";
 
 export async function getCourses(
   page: number,
   searchData?: SearchData,
-) {
+): Promise<ActionResult<any>> {
   const params = new URLSearchParams();
   if (searchData?.minPrice) {
     params.append("minPrice", searchData.minPrice.toString());
@@ -28,11 +34,11 @@ export async function getCourses(
       `${process.env.NEXT_PUBLIC_API_URL}/api/v1/courses?${params.toString()}`,
     );
     if (res.status !== 200) {
-      throw new Error(res.data.message || "Failed to fetch courses");
+      return fail(res.data.message || "Failed to fetch courses");
     }
-    return res.data;
+    return ok(res.data);
   } catch (error) {
     console.log(error);
-    throw new Error("Failed to fetch courses");
+    return fail(getAxiosErrorMessage(error, "Failed to fetch courses"));
   }
 }

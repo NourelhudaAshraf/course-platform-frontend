@@ -1,13 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 import { getToken } from "@/lib/helpers";
+import {
+  ActionResult,
+  fail,
+  getAxiosErrorMessage,
+  ok,
+  requiresAuth,
+} from "@/lib/actionResult";
 import axios from "axios";
 
-export default async function enrollFromAPI(id: string) {
+type CheckoutSession = {
+  url: string;
+};
+
+export default async function enrollFromAPI(
+  id: string,
+): Promise<ActionResult<CheckoutSession>> {
   const headers = await getToken();
-  if (!("headers" in headers)) {
-    throw new Error("Please login to enroll in a course");
-  }
+  if (!("headers" in headers)) return requiresAuth();
+
   try {
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/api/v1/enrollment/checkout-session/${id}`,
@@ -15,18 +27,20 @@ export default async function enrollFromAPI(id: string) {
         ...headers,
       },
     );
-    if (res.status !== 200)
-      throw new Error(res.data.message || "Failed to pay");
-    return res.data.session;
+    if (res.status !== 200) {
+      return fail(res.data.message || "Failed to pay");
+    }
+    return ok(res.data.session);
   } catch (e: any) {
     console.log(e.response?.data?.message);
-    throw new Error(e.response?.data?.message || "Failed to pay");
+    return fail(getAxiosErrorMessage(e, "Failed to pay"));
   }
 }
 
-export async function getEnrolledCourses() {
+export async function getEnrolledCourses(): Promise<ActionResult<any>> {
   const headers = await getToken();
-  if (!("headers" in headers)) return null;
+  if (!("headers" in headers)) return requiresAuth();
+
   try {
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/api/v1/enrollment/my-courses/`,
@@ -34,20 +48,22 @@ export async function getEnrolledCourses() {
         ...headers,
       },
     );
-    if (res.status !== 200)
-      throw new Error(res.data.message || "Failed to get enrolled courses");
-    return res.data;
+    if (res.status !== 200) {
+      return fail(res.data.message || "Failed to get enrolled courses");
+    }
+    return ok(res.data);
   } catch (e: any) {
     console.log(e.response?.data?.message);
-    throw new Error(
-      e.response?.data?.message || "Failed to get enrolled courses",
-    );
+    return fail(getAxiosErrorMessage(e, "Failed to get enrolled courses"));
   }
 }
 
-export async function checkIsCourseEnrolled(id: string) {
+export async function checkIsCourseEnrolled(
+  id: string,
+): Promise<ActionResult<boolean>> {
   const headers = await getToken();
-  if (!("headers" in headers)) return null;
+  if (!("headers" in headers)) return ok(false);
+
   try {
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/api/v1/enrollment/${id}`,
@@ -55,12 +71,12 @@ export async function checkIsCourseEnrolled(id: string) {
         ...headers,
       },
     );
-    if (res.status !== 200) throw new Error(res.data.message);
-    return res.data.data;
-  } catch (e) {
-    if (axios.isAxiosError(e)) {
-      console.log(e.response?.data?.status);
-      throw new Error(e.response?.data?.message || "Something went wrong");
+    if (res.status !== 200) {
+      return fail(res.data.message || "Failed to check enrollment");
     }
+    return ok(Boolean(res.data.data));
+  } catch (e) {
+    console.log(e);
+    return fail(getAxiosErrorMessage(e, "Something went wrong"));
   }
 }

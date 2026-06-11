@@ -32,16 +32,15 @@ export default function ManageUsersPage() {
   const [promoteDialogOpen, setPromoteDialogOpen] = useState(false);
 
   const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const data = await getAllUsers(page);
-      setTotalPages(data.totalPages);
-      setUsers(data.data);
-    } catch (e: any) {
-      toast.error(e.message as string);
-    } finally {
-      setLoading(false);
+    setLoading(true);
+    const result = await getAllUsers(page);
+    if (result.success) {
+      setTotalPages(result.data.totalPages);
+      setUsers(result.data.data);
+    } else {
+      toast.error(result.error);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -51,17 +50,15 @@ export default function ManageUsersPage() {
   const handleDelete = async () => {
     if (!selectedUser) return;
 
-    try {
-      await deleteUser(selectedUser._id);
+    const result = await deleteUser(selectedUser._id);
+    if (result.success) {
       toast.success("User deleted successfully");
       setSelectedUser(null);
-    } catch (error: any) {
-      console.log(error);
-      toast.error("Failed to delete user");
-    } finally {
-      setDeleteDialogOpen(false);
-      await fetchUsers();
+    } else {
+      toast.error(result.error);
     }
+    setDeleteDialogOpen(false);
+    await fetchUsers();
   };
 
   const handlePageChange = (page: number) => {
@@ -71,17 +68,15 @@ export default function ManageUsersPage() {
   const handlePromoteToAdmin = async () => {
     if (!selectedUser) return;
 
-    try {
-      await promoteUser(selectedUser._id);
+    const result = await promoteUser(selectedUser._id);
+    if (result.success) {
       toast.success("User promoted successfully");
       setSelectedUser(null);
-    } catch (error: any) {
-      console.log(error);
-      toast.error("Failed to promote user");
-    } finally {
-      await fetchUsers();
-      setPromoteDialogOpen(false);
+    } else {
+      toast.error(result.error);
     }
+    await fetchUsers();
+    setPromoteDialogOpen(false);
   };
 
   const columns: Column<UserProps>[] = [

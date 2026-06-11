@@ -49,16 +49,15 @@ export default function ManageCoursesPage() {
   );
 
   const fetchCourses = async (searchData?: SearchData) => {
-    try {
-      setLoading(true);
-      const coursesData = await getCoursesFromAPI(page, searchData);
-      setTotalPages(coursesData.totalPages);
-      setCourses(coursesData.data);
-    } catch (e: any) {
-      toast.error(e.message as string);
-    } finally {
-      setLoading(false);
+    setLoading(true);
+    const result = await getCoursesFromAPI(page, searchData);
+    if (result.success) {
+      setTotalPages(result.data.totalPages);
+      setCourses(result.data.data);
+    } else {
+      toast.error(result.error);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -68,17 +67,15 @@ export default function ManageCoursesPage() {
   const handleDelete = async () => {
     if (!selectedCourse) return;
 
-    try {
-      await deleteCourse(selectedCourse._id);
+    const result = await deleteCourse(selectedCourse._id);
+    if (result.success) {
       toast.success("Course deleted successfully");
       setDeleteDialogOpen(false);
       setSelectedCourse(null);
-    } catch (error: any) {
-      console.log(error);
-      toast.error("Failed to delete course");
-    } finally {
-      await fetchCourses();
+    } else {
+      toast.error(result.error);
     }
+    await fetchCourses();
   };
 
   const handleSearch = async () => {

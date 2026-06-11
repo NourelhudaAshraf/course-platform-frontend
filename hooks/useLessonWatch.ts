@@ -98,18 +98,17 @@ export function useLessonWatch({
 
     isSavingRef.current = true;
     try {
-      const data = await watchLesson(activeLessonId, rounded);
+      const result = await watchLesson(activeLessonId, rounded);
+      if (!result.success) return;
       lastSavedPositionRef.current = rounded;
       lastSaveTimeRef.current = Date.now();
       setUserLessonsMap((prev) => ({
         ...prev,
         [activeLessonId]: {
-          completed: Boolean(data.completed),
-          lastPosition: data.lastPosition,
+          completed: Boolean(result.data.completed),
+          lastPosition: result.data.lastPosition,
         },
       }));
-    } catch {
-      // Watch save failures should not interrupt playback
     } finally {
       isSavingRef.current = false;
       if (pendingSaveRef.current !== null) {
@@ -186,7 +185,7 @@ export function useLessonWatch({
         hasWatchedRef.current &&
         position !== lastSavedPositionRef.current
       ) {
-        void watchLesson(activeLessonId, position).catch(() => {});
+        void watchLesson(activeLessonId, position);
       }
     };
   }, [flushBeforeLeave, lessonId, saveCurrentWatch]);

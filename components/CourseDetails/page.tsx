@@ -13,7 +13,9 @@ import BreadcrumbC from "../Breadcrumb/page";
 import LessonsSection from "./LessonsSection/page";
 import EnrollmentCard from "./EnrollmentCard/page";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import enrollFromAPI, { checkIsCourseEnrolled } from "@/actions/enroll";
+import { UNAUTHENTICATED } from "@/lib/actionResult";
 import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
 
@@ -25,30 +27,31 @@ export default function CourseDetails({
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [checkEnrolled, setCheckEnrolled] = useState(true);
+  const router = useRouter();
 
   async function handleEnroll() {
-    try {
-      setIsEnrolling(true);
-      const session = await enrollFromAPI(course._id);
-      if (session) window.location.replace(session.url);
-    } catch (e: any) {
-      console.log("error: ", e);
-      toast.error(e.message);
-    } finally {
+    setIsEnrolling(true);
+    const result = await enrollFromAPI(course._id);
+    if (!result.success) {
+      if (result.code === UNAUTHENTICATED) {
+        const redirect = encodeURIComponent(window.location.pathname);
+        router.push(`/login?redirect=${redirect}`);
+      } else {
+        toast.error(result.error);
+      }
       setIsEnrolling(false);
+      return;
     }
+    window.location.replace(result.data.url);
+    setIsEnrolling(false);
   }
 
   const isCourseEnrolled = async () => {
-    try {
-      const isCourseEn = await checkIsCourseEnrolled(course._id);
-      setIsEnrolled(isCourseEn);
-    } catch (e: any) {
-      console.log("error: ", e);
-      toast.error(e.message);
-    } finally {
-      setCheckEnrolled(false);
+    const result = await checkIsCourseEnrolled(course._id);
+    if (result.success) {
+      setIsEnrolled(result.data);
     }
+    setCheckEnrolled(false);
   };
   useEffect(() => {
     if (course) isCourseEnrolled();

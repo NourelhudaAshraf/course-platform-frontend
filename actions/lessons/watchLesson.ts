@@ -1,14 +1,23 @@
 "use server";
 
 import { getToken } from "@/lib/helpers";
+import {
+  ActionResult,
+  fail,
+  getAxiosErrorMessage,
+  ok,
+  requiresAuth,
+} from "@/lib/actionResult";
 import { UserLessonProps } from "@/lib/types";
 import axios from "axios";
 
 export async function watchLesson(
   lessonId: string,
   lastPosition: number,
-): Promise<UserLessonProps> {
+): Promise<ActionResult<UserLessonProps>> {
   const headers = await getToken();
+  if (!("headers" in headers)) return requiresAuth();
+
   try {
     const res = await axios.post(
       `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/watch-lesson`,
@@ -17,12 +26,12 @@ export async function watchLesson(
     );
 
     if (res.status !== 200 && res.status !== 201) {
-      throw new Error(res.data.message || "Failed to save lesson progress");
+      return fail(res.data.message || "Failed to save lesson progress");
     }
 
-    return res.data.data;
+    return ok(res.data.data);
   } catch (error) {
     console.log(error);
-    throw new Error("Failed to save lesson progress");
+    return fail(getAxiosErrorMessage(error, "Failed to save lesson progress"));
   }
 }

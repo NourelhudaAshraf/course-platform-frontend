@@ -40,19 +40,20 @@ export function LessonsManager({ courseId }: LessonsManagerProps) {
   );
 
   const fetchData = async () => {
-    try {
-      setLoading(true);
-      const [lessonsData, course] = await Promise.all([
-        getLessons(courseId),
-        getCourseData(courseId),
-      ]);
-      setLessons(lessonsData);
-      setCourse(course);
-    } catch {
-      toast.error("Failed to load lessons");
-    } finally {
-      setLoading(false);
+    setLoading(true);
+    const [lessonsResult, courseResult] = await Promise.all([
+      getLessons(courseId),
+      getCourseData(courseId),
+    ]);
+    if (!lessonsResult.success) {
+      toast.error(lessonsResult.error);
+    } else if (!courseResult.success) {
+      toast.error(courseResult.error);
+    } else {
+      setLessons(lessonsResult.data);
+      setCourse(courseResult.data);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -60,50 +61,53 @@ export function LessonsManager({ courseId }: LessonsManagerProps) {
   }, [courseId]);
 
   const handleSubmit = async (data: LessonFormSubmitData) => {
-    try {
-      setSubmitting(true);
-      if (selectedLesson) {
-        await updateLesson(
-          selectedLesson._id,
-          { title: data.title, order: data.order },
-          data.video,
-        );
-        toast.success("Lesson updated successfully");
-      } else {
-        if (!data.video) {
-          toast.error("Please upload a video file");
-          setSubmitting(false);
-          return;
-        }
-        await createLesson(
-          courseId,
-          { title: data.title, order: data.order },
-          data.video,
-        );
-        toast.success("Lesson created successfully");
-      }
-      setFormOpen(false);
-      setSelectedLesson(null);
-      await fetchData();
-    } catch {
-      toast.error(
-        selectedLesson ? "Failed to update lesson" : "Failed to create lesson",
+    setSubmitting(true);
+    if (selectedLesson) {
+      const result = await updateLesson(
+        selectedLesson._id,
+        { title: data.title, order: data.order },
+        data.video,
       );
-    } finally {
-      setSubmitting(false);
+      if (!result.success) {
+        toast.error(result.error);
+        setSubmitting(false);
+        return;
+      }
+      toast.success("Lesson updated successfully");
+    } else {
+      if (!data.video) {
+        toast.error("Please upload a video file");
+        setSubmitting(false);
+        return;
+      }
+      const result = await createLesson(
+        courseId,
+        { title: data.title, order: data.order },
+        data.video,
+      );
+      if (!result.success) {
+        toast.error(result.error);
+        setSubmitting(false);
+        return;
+      }
+      toast.success("Lesson created successfully");
     }
+    setFormOpen(false);
+    setSelectedLesson(null);
+    await fetchData();
+    setSubmitting(false);
   };
 
   const handleDelete = async () => {
     if (!selectedLesson) return;
-    try {
-      await deleteLesson(selectedLesson._id);
+    const result = await deleteLesson(selectedLesson._id);
+    if (result.success) {
       toast.success("Lesson deleted successfully");
       setDeleteOpen(false);
       setSelectedLesson(null);
       await fetchData();
-    } catch {
-      toast.error("Failed to delete lesson");
+    } else {
+      toast.error(result.error);
     }
   };
 

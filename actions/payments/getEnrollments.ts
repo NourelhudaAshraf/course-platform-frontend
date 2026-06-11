@@ -2,11 +2,20 @@
 
 import { LIMIT } from "@/lib/constants";
 import { getToken } from "@/lib/helpers";
+import {
+  ActionResult,
+  fail,
+  getAxiosErrorMessage,
+  ok,
+  requiresAuth,
+} from "@/lib/actionResult";
 import axios from "axios";
 
-export async function getEnrollments(page = 1) {
+export async function getEnrollments(page = 1): Promise<ActionResult<any>> {
+  const headers = await getToken();
+  if (!("headers" in headers)) return requiresAuth();
+
   try {
-    const headers = await getToken();
     const params = new URLSearchParams({
       page: page.toString(),
       limit: LIMIT.toString(),
@@ -16,11 +25,11 @@ export async function getEnrollments(page = 1) {
       { ...headers },
     );
     if (res.status !== 200) {
-      throw new Error(res.data.message || "Failed to fetch enrollments");
+      return fail(res.data.message || "Failed to fetch enrollments");
     }
-    return res.data;
+    return ok(res.data);
   } catch (error) {
     console.log(error);
-    throw new Error("Failed to fetch enrollments");
+    return fail(getAxiosErrorMessage(error, "Failed to fetch enrollments"));
   }
 }

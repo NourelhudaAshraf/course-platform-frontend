@@ -17,16 +17,15 @@ export default function PaymentsPage() {
 
   useEffect(() => {
     const fetchPayments = async () => {
-      try {
-        setLoading(true);
-        const data = await getEnrollments(page);
-        setPayments(data.data ?? []);
-        setTotalPages(data.totalPages ?? 1);
-      } catch {
-        toast.error("Failed to load payments");
-      } finally {
-        setLoading(false);
+      setLoading(true);
+      const result = await getEnrollments(page);
+      if (result.success) {
+        setPayments(result.data.data ?? []);
+        setTotalPages(result.data.totalPages ?? 1);
+      } else {
+        toast.error(result.error);
       }
+      setLoading(false);
     };
 
     fetchPayments();

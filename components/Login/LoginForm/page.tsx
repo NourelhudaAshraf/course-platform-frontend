@@ -20,7 +20,7 @@ import { useRouter } from "next/navigation";
 import { LoginFormData, LoginSchema } from "@/lib/schemas/login";
 import axios from "axios";
 
-export default function LoginForm() {
+export default function LoginForm({ redirectTo }: { redirectTo?: string }) {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
@@ -43,7 +43,13 @@ export default function LoginForm() {
           : "Redirecting to Home Page...",
       });
       router.refresh();
-      router.replace(isAdmin ? "/admin" : "/");
+      const destination =
+        redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
+          ? redirectTo
+          : isAdmin
+            ? "/admin"
+            : "/";
+      router.replace(destination);
     } catch (e: any) {
       if (axios.isAxiosError(e)) {
         console.log(e.response?.data?.message);

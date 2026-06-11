@@ -4,16 +4,25 @@
 import { getToken } from "@/lib/helpers";
 import { buildCourseFormData } from "@/lib/buildCourseFormData";
 import { CourseFormData } from "@/lib/schemas/course.schema";
+import {
+  ActionResult,
+  fail,
+  getAxiosErrorMessage,
+  ok,
+  requiresAuth,
+} from "@/lib/actionResult";
+import { CourseProps } from "@/lib/types";
 import axios from "axios";
 
 export async function updateCourse(
   id: string,
   data: CourseFormData,
   imageFile?: File,
-) {
-  try {
-    const headers = await getToken();
+): Promise<ActionResult<CourseProps>> {
+  const headers = await getToken();
+  if (!("headers" in headers)) return requiresAuth();
 
+  try {
     if (imageFile) {
       const formData = await buildCourseFormData(data, imageFile);
       const res = await axios.patch(
@@ -22,9 +31,9 @@ export async function updateCourse(
         { ...headers },
       );
       if (res.status !== 200) {
-        throw new Error(res.data.message || "Failed to update course");
+        return fail(res.data.message || "Failed to update course");
       }
-      return res.data.data;
+      return ok(res.data.data);
     }
 
     const res = await axios.patch(
@@ -33,11 +42,11 @@ export async function updateCourse(
       { ...headers },
     );
     if (res.status !== 200) {
-      throw new Error(res.data.message || "Failed to update course");
+      return fail(res.data.message || "Failed to update course");
     }
-    return res.data.data;
+    return ok(res.data.data);
   } catch (error: any) {
     console.log(error);
-    throw new Error(error.response?.data?.message || "Failed to update course");
+    return fail(getAxiosErrorMessage(error, "Failed to update course"));
   }
 }

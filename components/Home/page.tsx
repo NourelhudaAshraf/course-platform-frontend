@@ -16,21 +16,18 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1);
 
   async function getCourses(searchData?: SearchData | undefined) {
-    try {
-      setLoading(true);
-      const data = await getCoursesFromAPI(page, searchData);
-      setCoursesList(data.data as CourseProps[]);
-      setTotalPages(data.totalPages);
-      return data.results;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error("Fetching failed", {
-        description: error.message as string,
-      });
-    } finally {
+    setLoading(true);
+    const result = await getCoursesFromAPI(page, searchData);
+    if (result.success) {
+      setCoursesList(result.data.data as CourseProps[]);
+      setTotalPages(result.data.totalPages);
       setLoading(false);
+      return result.data.results;
     }
+    toast.error("Fetching failed", {
+      description: result.error,
+    });
+    setLoading(false);
   }
 
   useEffect(() => {

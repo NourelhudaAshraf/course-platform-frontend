@@ -19,32 +19,28 @@ export default function AdminOverview() {
 
   useEffect(() => {
     async function getStatics() {
-      try {
-        setLoadingStats(true);
-        const statics = await getStatistics();
-        setStats(statics);
-      } catch (error: any) {
-        console.log(error);
+      setLoadingStats(true);
+      const result = await getStatistics();
+      if (result.success) {
+        setStats(result.data);
+      } else {
         toast.error("Fetching failed", {
-          description: error.message as string,
+          description: result.error,
         });
-      } finally {
-        setLoadingStats(false);
       }
+      setLoadingStats(false);
     }
     async function getLatestUsersData() {
-      try {
-        setLoadingUsers(true);
-        const users = await getLatestUsers();
-        setUsers(users);
-      } catch (error: any) {
-        console.log(error);
+      setLoadingUsers(true);
+      const result = await getLatestUsers();
+      if (result.success) {
+        setUsers(result.data);
+      } else {
         toast.error("Fetching failed", {
-          description: error.message as string,
+          description: result.error,
         });
-      } finally {
-        setLoadingUsers(false);
       }
+      setLoadingUsers(false);
     }
     getStatics();
     getLatestUsersData();

@@ -1,18 +1,27 @@
 "use server";
 
+import {
+  ActionResult,
+  fail,
+  getAxiosErrorMessage,
+  ok,
+} from "@/lib/actionResult";
+import { LessonProps } from "@/lib/types";
 import axios from "axios";
 
-export async function getLessons(courseId: string) {
+export async function getLessons(
+  courseId: string,
+): Promise<ActionResult<LessonProps[]>> {
   try {
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/api/v1/courses/${courseId}/lessons`,
     );
     if (res.status !== 200) {
-      throw new Error(res.data.message || "Failed to fetch lessons");
+      return fail(res.data.message || "Failed to fetch lessons");
     }
-    return res.data.data;
+    return ok(res.data.data);
   } catch (error) {
     console.log(error);
-    throw new Error("Failed to fetch lessons");
+    return fail(getAxiosErrorMessage(error, "Failed to fetch lessons"));
   }
 }

@@ -1,9 +1,4 @@
-import {
-  CourseDetailsPageProps,
-  CourseProps,
-  LessonProps,
-  UserLessonSummary,
-} from "@/lib/types";
+import { CourseDetailsPageProps } from "@/lib/types";
 import { notFound } from "next/navigation";
 import CourseDetails from "@/components/CourseDetails/page";
 import { getUserLessonsForCourse } from "@/actions/lessons/getCompletedLessons";
@@ -14,20 +9,20 @@ export default async function courseDetailsPage({
   params,
 }: CourseDetailsPageProps) {
   const { id } = await params;
-  let course: CourseProps;
-  let lessons: LessonProps[];
-  let userLessons: Record<string, UserLessonSummary>;
 
-  try {
-    [course, lessons, userLessons] = await Promise.all([
-      getCourseData(id),
-      getLessons(id),
-      getUserLessonsForCourse(id),
-    ]);
-  } catch (e) {
-    console.log(e);
+  const [courseResult, lessonsResult, userLessons] = await Promise.all([
+    getCourseData(id),
+    getLessons(id),
+    getUserLessonsForCourse(id),
+  ]);
+
+  if (!courseResult.success || !lessonsResult.success) {
     notFound();
   }
+
+  const course = courseResult.data;
+  const lessons = lessonsResult.data;
+
   if (!course || !lessons) notFound();
   return (
     <CourseDetails

@@ -4,16 +4,25 @@
 import { getToken } from "@/lib/helpers";
 import { buildLessonFormData } from "@/lib/buildLessonFormData";
 import { LessonFormData } from "@/lib/schemas/lesson.schema";
+import {
+  ActionResult,
+  fail,
+  getAxiosErrorMessage,
+  ok,
+  requiresAuth,
+} from "@/lib/actionResult";
+import { LessonProps } from "@/lib/types";
 import axios from "axios";
 
 export async function updateLesson(
   lessonId: string,
   data: LessonFormData,
   videoFile?: File,
-) {
-  try {
-    const headers = await getToken();
+): Promise<ActionResult<LessonProps>> {
+  const headers = await getToken();
+  if (!("headers" in headers)) return requiresAuth();
 
+  try {
     if (videoFile) {
       const formData = await buildLessonFormData(data, videoFile);
 
@@ -23,9 +32,9 @@ export async function updateLesson(
         { ...headers },
       );
       if (res.status !== 200) {
-        throw new Error(res.data.message || "Failed to update lesson");
+        return fail(res.data.message || "Failed to update lesson");
       }
-      return res.data.data;
+      return ok(res.data.data);
     }
 
     const res = await axios.patch(
@@ -34,11 +43,11 @@ export async function updateLesson(
       { ...headers },
     );
     if (res.status !== 200) {
-      throw new Error(res.data.message || "Failed to update lesson");
+      return fail(res.data.message || "Failed to update lesson");
     }
-    return res.data.data;
+    return ok(res.data.data);
   } catch (error: any) {
     console.log(error);
-    throw new Error(error.response?.data?.message || "Failed to update lesson");
+    return fail(getAxiosErrorMessage(error, "Failed to update lesson"));
   }
 }

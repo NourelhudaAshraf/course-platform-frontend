@@ -19,21 +19,18 @@ export default function MyCourses() {
   const [totalPages, setTotalPages] = useState(1);
 
   async function getCourses() {
-    try {
-      setLoading(true);
-      const data = await getEnrolledCourses();
-      setCoursesList(data.data as EnrollProps[]);
-      setTotalPages(data.totalPages);
-      return data.results;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      console.log(error);
-      toast.error("Fetching failed", {
-        description: error.message as string,
-      });
-    } finally {
+    setLoading(true);
+    const result = await getEnrolledCourses();
+    if (result.success) {
+      setCoursesList(result.data.data as EnrollProps[]);
+      setTotalPages(result.data.totalPages);
       setLoading(false);
+      return result.data.results;
     }
+    toast.error("Fetching failed", {
+      description: result.error,
+    });
+    setLoading(false);
   }
 
   useEffect(() => {

@@ -16,36 +16,33 @@ export default function ProfilePage() {
   const router = useRouter();
   useEffect(() => {
     const fetchProfile = async () => {
-      try {
-        const data = await getCurrentUser();
+      const data = await getCurrentUser();
+      if (data) {
         setName(data.name || "");
         setEmail(data.email || "");
-      } catch (error: any) {
-        console.error("Error fetching profile:", error);
+      } else {
         toast.error("Failed to load profile", {
-          description: error.message as string,
+          description: "Please login to view your profile",
         });
-      } finally {
-        setLoading(false);
       }
+      setLoading(false);
     };
     fetchProfile();
   }, []);
 
   const saveData = async (data: ProfileFormData) => {
-    try {
-      const updateUser = await updateCurrentUserData(data);
+    const result = await updateCurrentUserData(data);
+    if (result.success) {
       toast.success("Profile updated successfully!");
       setName(data.name);
-      return updateUser;
-    } catch (error: any) {
-      console.error("Error updating profile:", error);
-      toast.error("Failed to update profile", {
-        description: error.message as string,
-      });
-    } finally {
       router.refresh();
+      return data;
     }
+    toast.error("Failed to update profile", {
+      description: result.error,
+    });
+    router.refresh();
+    return data;
   };
 
   // Get initials for avatar
