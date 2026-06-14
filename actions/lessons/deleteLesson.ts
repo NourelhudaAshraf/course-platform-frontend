@@ -1,6 +1,6 @@
 "use server";
 
-import { getToken } from "@/lib/helpers";
+import { api, isAuthenticated } from "@/lib/api";
 import {
   ActionResult,
   fail,
@@ -8,17 +8,12 @@ import {
   ok,
   requiresAuth,
 } from "@/lib/actionResult";
-import axios from "axios";
 
 export async function deleteLesson(lessonId: string): Promise<ActionResult> {
-  const headers = await getToken();
-  if (!("headers" in headers)) return requiresAuth();
+  if (!(await isAuthenticated())) return requiresAuth();
 
   try {
-    const res = await axios.delete(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/lessons/${lessonId}`,
-      { ...headers },
-    );
+    const res = await api.delete(`/api/v1/lessons/${lessonId}`);
     if (res.status !== 204 && res.status !== 200) {
       return fail(res.data.message || "Failed to delete lesson");
     }

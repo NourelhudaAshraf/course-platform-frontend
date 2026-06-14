@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
-import { getToken } from "@/lib/helpers";
+import { api, isAuthenticated } from "@/lib/api";
 import { buildLessonFormData } from "@/lib/buildLessonFormData";
 import { LessonFormData } from "@/lib/schemas/lesson.schema";
 import {
@@ -12,23 +12,17 @@ import {
   requiresAuth,
 } from "@/lib/actionResult";
 import { LessonProps } from "@/lib/types";
-import axios from "axios";
 
 export async function createLesson(
   courseId: string,
   data: LessonFormData,
   videoFile: File,
 ): Promise<ActionResult<LessonProps>> {
-  const headers = await getToken();
-  if (!("headers" in headers)) return requiresAuth();
+  if (!(await isAuthenticated())) return requiresAuth();
 
   try {
     const formData = await buildLessonFormData(data, videoFile);
-    const res = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/courses/${courseId}/lessons`,
-      formData,
-      { ...headers },
-    );
+    const res = await api.post(`/api/v1/courses/${courseId}/lessons`, formData);
     if (res.status !== 201 && res.status !== 200) {
       return fail(res.data.message || "Failed to create lesson");
     }

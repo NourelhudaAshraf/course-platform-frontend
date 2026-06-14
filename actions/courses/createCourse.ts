@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
-import { getToken } from "@/lib/helpers";
+import { api, isAuthenticated } from "@/lib/api";
 import { buildCourseFormData } from "@/lib/buildCourseFormData";
 import { CourseFormData } from "@/lib/schemas/course.schema";
 import {
@@ -12,22 +12,16 @@ import {
   requiresAuth,
 } from "@/lib/actionResult";
 import { CourseProps } from "@/lib/types";
-import axios from "axios";
 
 export async function createCourse(
   data: CourseFormData,
   imageFile: File,
 ): Promise<ActionResult<CourseProps>> {
-  const headers = await getToken();
-  if (!("headers" in headers)) return requiresAuth();
+  if (!(await isAuthenticated())) return requiresAuth();
 
   try {
     const formData = await buildCourseFormData(data, imageFile);
-    const res = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/courses`,
-      formData,
-      { ...headers },
-    );
+    const res = await api.post("/api/v1/courses", formData);
     if (res.status !== 201 && res.status !== 200) {
       return fail(res.data.message || "Failed to create course");
     }

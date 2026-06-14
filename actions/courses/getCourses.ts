@@ -8,7 +8,7 @@ import {
   ok,
 } from "@/lib/actionResult";
 import { SearchData } from "@/lib/types";
-import axios from "axios";
+import { api } from "@/lib/api";
 
 export async function getCourses(
   page: number,
@@ -30,9 +30,7 @@ export async function getCourses(
   params.append("limit", LIMIT.toString());
 
   try {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/courses?${params.toString()}`,
-    );
+    const res = await api.get(`/api/v1/courses?${params.toString()}`);
     if (res.status !== 200) {
       return fail(res.data.message || "Failed to fetch courses");
     }

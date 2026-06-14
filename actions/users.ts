@@ -1,6 +1,6 @@
 "use server";
+import { api, isAuthenticated } from "@/lib/api";
 import { LIMIT } from "@/lib/constants";
-import { getToken } from "@/lib/helpers";
 import {
   ActionResult,
   fail,
@@ -8,23 +8,16 @@ import {
   ok,
   requiresAuth,
 } from "@/lib/actionResult";
-import axios from "axios";
 
 export async function getAllUsers(page: number): Promise<ActionResult<any>> {
   const params = new URLSearchParams();
   params.append("page", page.toString());
   params.append("limit", LIMIT.toString());
 
-  const headers = await getToken();
-  if (!("headers" in headers)) return requiresAuth();
+  if (!(await isAuthenticated())) return requiresAuth();
 
   try {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users?${params.toString()}`,
-      {
-        ...headers,
-      },
-    );
+    const res = await api.get(`/api/v1/users?${params.toString()}`);
     if (res.status !== 200) {
       return fail(res.data.message || "Failed to fetch users data");
     }
@@ -36,16 +29,10 @@ export async function getAllUsers(page: number): Promise<ActionResult<any>> {
 }
 
 export async function deleteUser(id: string): Promise<ActionResult> {
-  const headers = await getToken();
-  if (!("headers" in headers)) return requiresAuth();
+  if (!(await isAuthenticated())) return requiresAuth();
 
   try {
-    const res = await axios.delete(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/${id}`,
-      {
-        ...headers,
-      },
-    );
+    const res = await api.delete(`/api/v1/users/${id}`);
     if (res.status !== 204) {
       return fail(res.data.message || "Failed to delete user");
     }
@@ -57,17 +44,10 @@ export async function deleteUser(id: string): Promise<ActionResult> {
 }
 
 export async function promoteUser(id: string): Promise<ActionResult> {
-  const headers = await getToken();
-  if (!("headers" in headers)) return requiresAuth();
+  if (!(await isAuthenticated())) return requiresAuth();
 
   try {
-    const res = await axios.patch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/promote/${id}`,
-      {},
-      {
-        ...headers,
-      },
-    );
+    const res = await api.patch(`/api/v1/users/promote/${id}`, {});
     if (res.status !== 200) {
       return fail(res.data.message || "Failed to promote user");
     }

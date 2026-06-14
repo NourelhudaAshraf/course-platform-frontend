@@ -1,8 +1,7 @@
 "use server";
 
-import { getToken } from "@/lib/helpers";
+import { api, isAuthenticated } from "@/lib/api";
 import { UserLessonSummary } from "@/lib/types";
-import axios from "axios";
 
 type UserLessonRecord = {
   lesson?: string | { _id: string };
@@ -61,15 +60,10 @@ function toUserLessonsMap(data: unknown): Record<string, UserLessonSummary> {
 export async function getUserLessonsForCourse(
   courseId: string,
 ): Promise<Record<string, UserLessonSummary>> {
-  const headers = await getToken();
-  console.log("headers", headers);
-  if (!("headers" in headers)) return {};
+  if (!(await isAuthenticated())) return {};
 
   try {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/courses/${courseId}/user-lessons`,
-      headers,
-    );
+    const res = await api.get(`/api/v1/users/courses/${courseId}/user-lessons`);
 
     if (res.status !== 200) return {};
 
@@ -78,9 +72,8 @@ export async function getUserLessonsForCourse(
     console.log(error);
 
     try {
-      const fallback = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/courses/${courseId}/completed-lessons`,
-        headers,
+      const fallback = await api.get(
+        `/api/v1/users/courses/${courseId}/completed-lessons`,
       );
 
       if (fallback.status !== 200) return {};

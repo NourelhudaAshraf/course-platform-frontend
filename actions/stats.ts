@@ -1,5 +1,5 @@
 "use server";
-import { getToken } from "@/lib/helpers";
+import { api, isAuthenticated } from "@/lib/api";
 import {
   ActionResult,
   fail,
@@ -8,17 +8,12 @@ import {
   requiresAuth,
 } from "@/lib/actionResult";
 import { StatsProps, UserProps } from "@/lib/types";
-import axios from "axios";
 
 export async function getStatistics(): Promise<ActionResult<StatsProps>> {
-  const headers = await getToken();
-  if (!("headers" in headers)) return requiresAuth();
+  if (!(await isAuthenticated())) return requiresAuth();
 
   try {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/statistics/`,
-      { ...headers },
-    );
+    const res = await api.get("/api/v1/statistics/");
     if (res.status !== 200) {
       return fail(res.data.message || "Failed to fetch statistics data");
     }
@@ -30,14 +25,10 @@ export async function getStatistics(): Promise<ActionResult<StatsProps>> {
 }
 
 export async function getLatestUsers(): Promise<ActionResult<UserProps[]>> {
-  const headers = await getToken();
-  if (!("headers" in headers)) return requiresAuth();
+  if (!(await isAuthenticated())) return requiresAuth();
 
   try {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/latest-users`,
-      { ...headers },
-    );
+    const res = await api.get("/api/v1/users/latest-users");
     if (res.status !== 200) {
       return fail(res.data.message || "Failed to fetch latest users data");
     }

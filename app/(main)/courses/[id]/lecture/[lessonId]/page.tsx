@@ -5,7 +5,7 @@ import LectureDetails from "@/components/LectureDetails/page";
 import { LectureDetailsPageProps } from "@/lib/types";
 import { notFound } from "next/navigation";
 
-export default async function courseDetailsPage({
+export default async function LectureDetailsPage({
   params,
 }: LectureDetailsPageProps) {
   const { id, lessonId } = await params;

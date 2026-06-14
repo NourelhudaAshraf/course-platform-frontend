@@ -7,13 +7,11 @@ import {
   ok,
 } from "@/lib/actionResult";
 import { CourseProps } from "@/lib/types";
-import axios from "axios";
+import { api } from "@/lib/api";
 
 export async function getCourse(id: string): Promise<ActionResult<CourseProps>> {
   try {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/courses/${id}`,
-    );
+    const res = await api.get(`/api/v1/courses/${id}`);
     if (res.status !== 200) {
       return fail(res.data.message || "Failed to fetch course");
     }

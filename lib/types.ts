@@ -77,6 +77,11 @@ export type LessonsManagerProps = {
   readonly courseId: string;
 };
 
+export type LessonFormPageProps = {
+  readonly courseId: string;
+  readonly lessonId?: string;
+};
+
 export type CourseFormComponentProps = {
   readonly defaultValues?: {
     title: string;
@@ -101,6 +106,7 @@ export type LessonFormComponentProps = {
   };
   readonly defaultValues?: {
     title: string;
+    description: string;
     order: number;
   };
   readonly existingVideoUrl?: string;

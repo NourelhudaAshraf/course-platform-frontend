@@ -5,7 +5,7 @@ import { getUserLessonsForCourse } from "@/actions/lessons/getCompletedLessons";
 import { getLessons } from "@/actions/lessons/getLessons";
 import { getCourse as getCourseData } from "@/actions/courses/getCourse";
 
-export default async function courseDetailsPage({
+export default async function CourseDetailsPage({
   params,
 }: CourseDetailsPageProps) {
   const { id } = await params;

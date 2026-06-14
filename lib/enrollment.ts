@@ -1,4 +1,4 @@
-import axios from "axios";
+import { api } from "@/lib/api";
 
 export async function isUserEnrolledInCourse(
   courseId: string,
@@ -7,12 +7,7 @@ export async function isUserEnrolledInCourse(
   if (!token || token === "logout") return false;
 
   try {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/enrollment/${courseId}`,
-      {
-        headers: { Cookie: `jwt=${token}` },
-      },
-    );
+    const res = await api.get(`/api/v1/enrollment/${courseId}`);
     if (res.status !== 200) return false;
     return Boolean(res.data.data);
   } catch {

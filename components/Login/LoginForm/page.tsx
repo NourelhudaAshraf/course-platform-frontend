@@ -35,7 +35,7 @@ export default function LoginForm({ redirectTo }: { redirectTo?: string }) {
   const onSubmit = async (data: LoginFormData) => {
     try {
       const res = await axios.post("/api/auth/login", data);
-      if (res.status !== 201) throw new Error(res.data.message);
+      if (res.status !== 200) throw new Error(res.data.message);
       const isAdmin = res.data.data.role === "admin";
       toast.success("Login successful!", {
         description: isAdmin

@@ -3,23 +3,20 @@
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ImageIcon, Loader2, Save, Upload, Video } from "lucide-react";
+import { Loader2, Save, Upload, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
 import { LessonFormComponentProps } from "@/lib/types";
 import {
   lessonSchema,
   LessonFormData,
   LessonFormSubmitData,
 } from "@/lib/schemas/lesson.schema";
-import { cn } from "@/lib/utils";
 
 const ACCEPTED_VIDEO_TYPES = "video/mp4,video/webm,video/ogg,video/quicktime";
 
 export function LessonForm({
-  course,
   defaultValues,
   existingVideoUrl,
   isEdit = false,
@@ -41,6 +38,7 @@ export function LessonForm({
     resolver: zodResolver(lessonSchema),
     defaultValues: defaultValues ?? {
       title: "",
+      description: "",
       order: 1,
     },
   });
@@ -112,7 +110,21 @@ export function LessonForm({
           disabled={loading}
         />
       </FormField>
-
+      <FormField
+        id="description"
+        label="Description"
+        error={errors.description?.message}
+        required
+      >
+        <textarea
+          id="description"
+          placeholder="Lesson description"
+          rows={4}
+          className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          {...register("description")}
+          disabled={loading}
+        />
+      </FormField>
       <div className="space-y-3">
         <FormField
           id="video"

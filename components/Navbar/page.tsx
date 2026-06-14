@@ -38,7 +38,7 @@ export default function Navbar({ name, role }: NavbarProps) {
   const mobileNavLinks = [
     ...navLinks,
     { name: "My Courses", href: "/my-courses", hidden: role !== "user" },
-    { name: "Profile", href: "/profile" },
+    { name: "Profile", href: "/profile", hidden: !role },
   ];
 
   return (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Plus, Edit, Trash2, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -14,11 +15,8 @@ import {
 } from "@/components/ui/dialog";
 import { SharedTable } from "@/components/shared/SharedTable";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { LessonForm } from "@/components/forms/LessonForm";
-import { createLesson } from "@/actions/lessons/createLesson";
 import { deleteLesson } from "@/actions/lessons/deleteLesson";
 import { getLessons } from "@/actions/lessons/getLessons";
-import { updateLesson } from "@/actions/lessons/updateLesson";
 import { getCourse as getCourseData } from "@/actions/courses/getCourse";
 import {
   Column,
@@ -26,15 +24,12 @@ import {
   LessonProps,
   LessonsManagerProps,
 } from "@/lib/types";
-import { LessonFormSubmitData } from "@/lib/schemas/lesson.schema";
 
 export function LessonsManager({ courseId }: LessonsManagerProps) {
   const [lessons, setLessons] = useState<LessonProps[]>([]);
   const [course, setCourse] = useState<CourseProps | null>(null);
   const [loading, setLoading] = useState(true);
-  const [formOpen, setFormOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState<LessonProps | null>(
     null,
   );
@@ -59,44 +54,6 @@ export function LessonsManager({ courseId }: LessonsManagerProps) {
   useEffect(() => {
     fetchData();
   }, [courseId]);
-
-  const handleSubmit = async (data: LessonFormSubmitData) => {
-    setSubmitting(true);
-    if (selectedLesson) {
-      const result = await updateLesson(
-        selectedLesson._id,
-        { title: data.title, order: data.order },
-        data.video,
-      );
-      if (!result.success) {
-        toast.error(result.error);
-        setSubmitting(false);
-        return;
-      }
-      toast.success("Lesson updated successfully");
-    } else {
-      if (!data.video) {
-        toast.error("Please upload a video file");
-        setSubmitting(false);
-        return;
-      }
-      const result = await createLesson(
-        courseId,
-        { title: data.title, order: data.order },
-        data.video,
-      );
-      if (!result.success) {
-        toast.error(result.error);
-        setSubmitting(false);
-        return;
-      }
-      toast.success("Lesson created successfully");
-    }
-    setFormOpen(false);
-    setSelectedLesson(null);
-    await fetchData();
-    setSubmitting(false);
-  };
 
   const handleDelete = async () => {
     if (!selectedLesson) return;
@@ -147,15 +104,12 @@ export function LessonsManager({ courseId }: LessonsManagerProps) {
       className: "text-right",
       render: (lesson) => (
         <div className="flex items-center justify-end gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setSelectedLesson(lesson);
-              setFormOpen(true);
-            }}
-          >
-            <Edit className="h-4 w-4 text-blue-600" />
+          <Button variant="ghost" size="sm" asChild>
+            <Link
+              href={`/admin/courses/${courseId}/lessons/edit/${lesson._id}`}
+            >
+              <Edit className="h-4 w-4 text-blue-600" />
+            </Link>
           </Button>
           <Button
             variant="ghost"
@@ -178,14 +132,11 @@ export function LessonsManager({ courseId }: LessonsManagerProps) {
         title={`Lessons — ${course?.title || "Course"}`}
         description="Add, edit, and manage course lessons"
         action={
-          <Button
-            onClick={() => {
-              setSelectedLesson(null);
-              setFormOpen(true);
-            }}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Lesson
+          <Button asChild>
+            <Link href={`/admin/courses/${courseId}/lessons/create`}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Lesson
+            </Link>
           </Button>
         }
       />
@@ -201,46 +152,6 @@ export function LessonsManager({ courseId }: LessonsManagerProps) {
         skeletonRows={4}
         skeletonColumns={4}
       />
-
-      <Dialog open={formOpen} onOpenChange={setFormOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {selectedLesson ? "Edit Lesson" : "Add Lesson"}
-            </DialogTitle>
-            <DialogDescription>
-              {selectedLesson
-                ? "Update lesson details"
-                : "Create a new lesson for this course"}
-            </DialogDescription>
-          </DialogHeader>
-          <LessonForm
-            course={
-              course
-                ? {
-                    title: course.title,
-                    description: course.description,
-                    price: course.price,
-                    image: course.image,
-                  }
-                : undefined
-            }
-            isEdit={!!selectedLesson}
-            existingVideoUrl={selectedLesson?.videoUrl}
-            defaultValues={
-              selectedLesson
-                ? {
-                    title: selectedLesson.title,
-                    order: selectedLesson.order,
-                  }
-                : undefined
-            }
-            onSubmit={handleSubmit}
-            loading={submitting}
-            submitLabel={selectedLesson ? "Update Lesson" : "Add Lesson"}
-          />
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>

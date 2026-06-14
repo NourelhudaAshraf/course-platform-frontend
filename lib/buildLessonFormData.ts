@@ -6,6 +6,7 @@ export async function buildLessonFormData(
 ): Promise<FormData> {
   const formData = new FormData();
   formData.append("title", data.title);
+  formData.append("description", data.description);
   formData.append("order", data.order.toString());
 
   const buffer = Buffer.from(await videoFile.arrayBuffer());

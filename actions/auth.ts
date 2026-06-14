@@ -1,5 +1,5 @@
 "use server";
-import { getToken } from "@/lib/helpers";
+import { api, isAuthenticated } from "@/lib/api";
 import { ProfileFormData } from "@/lib/schemas/profile";
 import {
   ActionResult,
@@ -9,20 +9,13 @@ import {
   requiresAuth,
 } from "@/lib/actionResult";
 import { UserProps } from "@/lib/types";
-import axios from "axios";
 
 export async function getCurrentUser(): Promise<UserProps | null> {
   try {
-    const headers = await getToken();
-    if (!("headers" in headers)) {
+    if (!(await isAuthenticated())) {
       return null;
     }
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/me`,
-      {
-        ...headers,
-      },
-    );
+    const res = await api.get("/api/v1/auth/me");
     if (res.status !== 200) return null;
     const { data: user } = await res.data;
     return user;
@@ -35,17 +28,10 @@ export async function getCurrentUser(): Promise<UserProps | null> {
 export async function updateCurrentUserData(
   data: ProfileFormData,
 ): Promise<ActionResult<UserProps>> {
-  const headers = await getToken();
-  if (!("headers" in headers)) return requiresAuth();
+  if (!(await isAuthenticated())) return requiresAuth();
 
   try {
-    const res = await axios.patch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/users/update-me`,
-      data,
-      {
-        ...headers,
-      },
-    );
+    const res = await api.patch("/api/v1/users/update-me", data);
     if (res.status !== 200) {
       return fail(res.data.message || "Failed to update profile");
     }
