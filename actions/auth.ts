@@ -1,5 +1,6 @@
 "use server";
 import { api, isAuthenticated } from "@/lib/api";
+import { ChangePasswordFormData } from "@/lib/schemas/changePassword";
 import { ProfileFormData } from "@/lib/schemas/profile";
 import {
   ActionResult,
@@ -40,5 +41,25 @@ export async function updateCurrentUserData(
   } catch (e) {
     console.log(e);
     return fail(getAxiosErrorMessage(e, "Failed to update profile"));
+  }
+}
+
+export async function updatePassword(
+  data: Pick<ChangePasswordFormData, "currentPassword" | "newPassword">,
+): Promise<ActionResult> {
+  if (!(await isAuthenticated())) return requiresAuth();
+
+  try {
+    const res = await api.patch("/api/v1/auth/update-password", {
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
+    });
+    if (res.status !== 200) {
+      return fail(res.data.message || "Failed to update password");
+    }
+    return ok(undefined);
+  } catch (e) {
+    console.log(e);
+    return fail(getAxiosErrorMessage(e, "Failed to update password"));
   }
 }

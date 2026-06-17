@@ -17,50 +17,45 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { LoginFormData, LoginSchema } from "@/lib/schemas/login";
+import {
+  ResetPasswordFormData,
+  ResetPasswordSchema,
+} from "@/lib/schemas/resetPassword";
 import axios from "axios";
 
-export default function LoginForm({ redirectTo }: { redirectTo?: string }) {
+export default function ResetPasswordForm({ token }: { token: string }) {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(LoginSchema),
+  } = useForm<ResetPasswordFormData>({
+    resolver: zodResolver(ResetPasswordSchema),
   });
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: ResetPasswordFormData) => {
     try {
-      const res = await axios.post("/api/auth/login", data);
+      const res = await axios.post(`/api/auth/reset-password/${token}`, {
+        password: data.password,
+      });
       if (res.status !== 200) throw new Error(res.data.message);
-      const isAdmin = res.data.data.role === "admin";
-      toast.success("Login successful!", {
-        description: isAdmin
-          ? "Redirecting to Dashboard..."
-          : "Redirecting to Home Page...",
+      toast.success("Password reset successful!", {
+        description: "Redirecting to Home Page...",
       });
       router.refresh();
-      const destination =
-        redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
-          ? redirectTo
-          : isAdmin
-            ? "/admin"
-            : "/";
-      router.replace(destination);
+      router.replace("/");
     } catch (e: any) {
       if (axios.isAxiosError(e)) {
-        console.log(e.response?.data?.message);
-        toast.error("Login failed", {
+        toast.error("Reset failed", {
           description:
             (e.response?.data?.message as string) ||
-            "Invalid email or password",
+            "Unable to reset password. The link may have expired.",
         });
       } else {
-        console.log(e);
-        toast.error("Login failed", {
+        toast.error("Reset failed", {
           description: (e.message as string) || "Something went wrong!",
         });
       }
@@ -72,36 +67,20 @@ export default function LoginForm({ redirectTo }: { redirectTo?: string }) {
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
           <CardTitle className="font-bold text-2xl bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Login
+            Reset password
           </CardTitle>
           <CardDescription className="text-base text-gray-600">
-            Enter your email and password to access your account
+            Enter your new password below
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-5">
-            {/* Email Field */}
-            <div className="space-y-2">
-              <Input
-                id="email"
-                type="email"
-                placeholder="Email (e.g.you@example.com)"
-                {...register("email")}
-                className="min-h-10 border-gray-200 focus:border-blue-500"
-                disabled={isSubmitting}
-              />
-              {errors.email && (
-                <p className="text-sm text-red-500">{errors.email.message}</p>
-              )}
-            </div>
-
-            {/* Password Field with Eye Toggle */}
             <div className="space-y-2">
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder="New password"
                   {...register("password")}
                   disabled={isSubmitting}
                   className="pr-10 min-h-10 border-gray-200 focus:border-blue-500"
@@ -124,14 +103,36 @@ export default function LoginForm({ redirectTo }: { redirectTo?: string }) {
                   {errors.password.message}
                 </p>
               )}
-              <div className="text-right">
-                <a
-                  href="/forgot-password"
-                  className="text-sm text-blue-600 hover:underline"
+            </div>
+
+            <div className="space-y-2">
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm new password"
+                  {...register("confirmPassword")}
+                  disabled={isSubmitting}
+                  className="pr-10 min-h-10 border-gray-200 focus:border-blue-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                  tabIndex={-1}
                 >
-                  Forgot password?
-                </a>
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
               </div>
+              {errors.confirmPassword && (
+                <p className="text-sm text-red-500">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
             </div>
           </CardContent>
 
@@ -141,13 +142,12 @@ export default function LoginForm({ redirectTo }: { redirectTo?: string }) {
               className="w-1/2 mx-auto bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Logging in..." : "Login"}
+              {isSubmitting ? "Resetting..." : "Reset password"}
             </Button>
 
             <p className="text-sm text-center text-gray-600">
-              {"Don't have an account? "}
-              <a href="/signup" className="text-blue-600 hover:underline">
-                Sign up
+              <a href="/login" className="text-blue-600 hover:underline">
+                Back to login
               </a>
             </p>
           </CardFooter>

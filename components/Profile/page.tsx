@@ -1,19 +1,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { toast } from "sonner";
 import { getCurrentUser, updateCurrentUserData } from "@/actions/auth";
 import { Spinner } from "../ui/spinner";
+import ChangePasswordForm from "./ChangePasswordForm/page";
 import ProfileForm from "./ProfileForm/page";
 import { ProfileFormData } from "@/lib/schemas/profile";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+
+type ProfileTab = "account" | "security";
 
 export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [activeTab, setActiveTab] = useState<ProfileTab>("account");
   const router = useRouter();
+
   useEffect(() => {
     const fetchProfile = async () => {
       const data = await getCurrentUser();
@@ -35,6 +49,7 @@ export default function ProfilePage() {
     if (result.success) {
       toast.success("Profile updated successfully!");
       setName(data.name);
+      setEmail(data.email);
       router.refresh();
       return data;
     }
@@ -45,11 +60,9 @@ export default function ProfilePage() {
     return data;
   };
 
-  // Get initials for avatar
   const getInitials = () => {
-    const nameInit = name || "";
-    if (!nameInit) return "U";
-    return nameInit
+    if (!name) return "U";
+    return name
       .split(" ")
       .map((n) => n[0])
       .join("")
@@ -59,31 +72,67 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex min-h-[60vh] items-center justify-center">
         <div className="flex flex-col items-center gap-2">
           <Spinner />
-          <p className="text-gray-500">Loading profile...</p>
+          <p className="text-sm text-gray-500">Loading profile...</p>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto">
-        {/* Profile Header */}
-        <div className="text-center mb-8">
-          <Avatar className="h-24 w-24 mx-auto mb-4 border-4 border-white shadow-lg">
-            <AvatarImage src="" />
-            <AvatarFallback className="bg-linear-to-r from-blue-600 to-purple-600 text-white text-2xl">
-              {getInitials()}
-            </AvatarFallback>
-          </Avatar>
-          <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
-          <p className="text-gray-500 mt-1">Update your personal information</p>
-        </div>
+  const tabs: { id: ProfileTab; label: string }[] = [
+    { id: "account", label: "Account" },
+    { id: "security", label: "Security" },
+  ];
 
-        <ProfileForm name={name} email={email} saveData={saveData} />
+  return (
+    <div className="px-4 py-8 sm:px-6 min-h-screen">
+      <div className="mx-auto max-w-lg">
+        <Card>
+          <CardHeader className="pb-4">
+            <div className="flex items-center gap-4">
+              <Avatar className="h-14 w-14 border-2 border-white shadow-md">
+                <AvatarImage src="" />
+                <AvatarFallback className="bg-linear-to-r from-blue-600 to-purple-600 text-lg text-white">
+                  {getInitials()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <CardTitle className="truncate text-xl">
+                  {name || "My Profile"}
+                </CardTitle>
+                <CardDescription className="truncate">{email}</CardDescription>
+              </div>
+            </div>
+
+            <div className="mt-4 flex gap-1 rounded-lg bg-gray-100 p-1">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    "flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    activeTab === tab.id
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-600 hover:text-gray-900",
+                  )}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </CardHeader>
+
+          <CardContent>
+            {activeTab === "account" ? (
+              <ProfileForm name={name} email={email} saveData={saveData} />
+            ) : (
+              <ChangePasswordForm />
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
