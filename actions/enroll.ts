@@ -23,7 +23,7 @@ export default async function enrollFromAPI(
     if (res.status !== 200) {
       return fail(res.data.message || "Failed to pay");
     }
-    return ok(res.data.session);
+    return ok(res.data.data);
   } catch (e: any) {
     console.log(e.response?.data?.message);
     return fail(getAxiosErrorMessage(e, "Failed to pay"));

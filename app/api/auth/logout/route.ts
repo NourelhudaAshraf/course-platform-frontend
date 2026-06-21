@@ -1,11 +1,12 @@
 import { clearJwtCookie, getJwtFromRequest } from "@/lib/auth-cookies";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function POST() {
   const token = await getJwtFromRequest();
 
   if (token) {
     await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/logout`, {
+      method: "POST",
       headers: { Cookie: `jwt=${token}` },
     });
   }

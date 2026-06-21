@@ -104,7 +104,7 @@ export function AdminSidebar({ userName }: AdminSidebarProps) {
   const router = useRouter();
   const handleLogout = async () => {
     try {
-      const res = await axios.get("/api/auth/logout");
+      const res = await axios.post("/api/auth/logout");
       if (res.status !== 200) throw new Error(res.data.message);
       toast.success("Logged out successfully");
       router.push("/login");
