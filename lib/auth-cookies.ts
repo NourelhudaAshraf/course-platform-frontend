@@ -49,3 +49,8 @@ export async function getJwtFromRequest(): Promise<string | undefined> {
   const token = cookieStore.get("jwt")?.value;
   return token && token !== "logout" ? token : undefined;
 }
+
+export async function setJwtInCookieStore(token: string) {
+  const cookieStore = await cookies();
+  cookieStore.set("jwt", token, getAuthCookieOptions());
+}

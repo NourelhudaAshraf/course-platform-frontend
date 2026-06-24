@@ -1,5 +1,11 @@
 "use server";
 import { api, isAuthenticated } from "@/lib/api";
+import {
+  extractJwtFromSetCookie,
+  getJwtFromRequest,
+  getSetCookieHeaders,
+  setJwtInCookieStore,
+} from "@/lib/auth-cookies";
 import { ChangePasswordFormData } from "@/lib/schemas/changePassword";
 import { ProfileFormData } from "@/lib/schemas/profile";
 import {
@@ -47,16 +53,36 @@ export async function updateCurrentUserData(
 export async function updatePassword(
   data: Pick<ChangePasswordFormData, "currentPassword" | "newPassword">,
 ): Promise<ActionResult> {
-  if (!(await isAuthenticated())) return requiresAuth();
+  const token = await getJwtFromRequest();
+  if (!token) return requiresAuth();
 
   try {
-    const res = await api.patch("/api/v1/auth/update-password", {
-      currentPassword: data.currentPassword,
-      newPassword: data.newPassword,
-    });
-    if (res.status !== 200) {
-      return fail(res.data.message || "Failed to update password");
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/update-password`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: `jwt=${token}`,
+        },
+        body: JSON.stringify({
+          currentPassword: data.currentPassword,
+          newPassword: data.newPassword,
+        }),
+      },
+    );
+
+    const body = await res.json();
+
+    if (!res.ok) {
+      return fail(body.message || "Failed to update password");
     }
+
+    const jwt =
+      extractJwtFromSetCookie(getSetCookieHeaders(res)) ?? body?.data?.token;
+
+    if (jwt) await setJwtInCookieStore(jwt);
+
     return ok(undefined);
   } catch (e) {
     console.log(e);
