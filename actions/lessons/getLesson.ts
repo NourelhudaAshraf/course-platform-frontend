@@ -10,10 +10,13 @@ import { LessonProps } from "@/lib/types";
 import { api } from "@/lib/api";
 
 export async function getLesson(
+  courseId: string,
   lessonId: string,
 ): Promise<ActionResult<LessonProps>> {
   try {
-    const res = await api.get(`/api/v1/lessons/${lessonId}`);
+    const res = await api.get(
+      `/api/v1/courses/${courseId}/lessons/${lessonId}`,
+    );
     if (res.status !== 200) {
       return fail(res.data.message || "Failed to fetch lesson");
     }

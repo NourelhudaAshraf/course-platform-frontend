@@ -9,11 +9,16 @@ import {
   requiresAuth,
 } from "@/lib/actionResult";
 
-export async function deleteLesson(lessonId: string): Promise<ActionResult> {
+export async function deleteLesson(
+  courseId: string,
+  lessonId: string,
+): Promise<ActionResult> {
   if (!(await isAuthenticated())) return requiresAuth();
 
   try {
-    const res = await api.delete(`/api/v1/lessons/${lessonId}`);
+    const res = await api.delete(
+      `/api/v1/courses/${courseId}/lessons/${lessonId}`,
+    );
     if (res.status !== 204 && res.status !== 200) {
       return fail(res.data.message || "Failed to delete lesson");
     }

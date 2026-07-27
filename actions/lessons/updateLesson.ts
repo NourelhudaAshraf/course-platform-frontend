@@ -14,6 +14,7 @@ import {
 import { LessonProps } from "@/lib/types";
 
 export async function updateLesson(
+  courseId: string,
   lessonId: string,
   data: LessonFormData,
   videoFile?: File,
@@ -24,14 +25,20 @@ export async function updateLesson(
     if (videoFile) {
       const formData = await buildLessonFormData(data, videoFile);
 
-      const res = await api.patch(`/api/v1/lessons/${lessonId}`, formData);
+      const res = await api.patch(
+        `/api/v1/courses/${courseId}/lessons/${lessonId}`,
+        formData,
+      );
       if (res.status !== 200) {
         return fail(res.data.message || "Failed to update lesson");
       }
       return ok(res.data.data);
     }
 
-    const res = await api.patch(`/api/v1/lessons/${lessonId}`, data);
+    const res = await api.patch(
+      `/api/v1/courses/${courseId}/lessons/${lessonId}`,
+      data,
+    );
     if (res.status !== 200) {
       return fail(res.data.message || "Failed to update lesson");
     }

@@ -28,7 +28,7 @@ export function LessonFormPage({ courseId, lessonId }: LessonFormPageProps) {
 
     const fetchLesson = async () => {
       setFetching(true);
-      const result = await getLesson(lessonId);
+      const result = await getLesson(courseId, lessonId);
       if (result.success) {
         setDefaultValues({
           title: result.data.title,
@@ -49,6 +49,7 @@ export function LessonFormPage({ courseId, lessonId }: LessonFormPageProps) {
     setLoading(true);
     if (isEdit && lessonId) {
       const result = await updateLesson(
+        courseId,
         lessonId,
         {
           title: data.title,

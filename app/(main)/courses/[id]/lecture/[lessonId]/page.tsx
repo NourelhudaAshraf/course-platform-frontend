@@ -11,7 +11,7 @@ export default async function LectureDetailsPage({
   const { id, lessonId } = await params;
 
   const [lessonResult, lessonsResult, userLessons] = await Promise.all([
-    getLesson(lessonId),
+    getLesson(id, lessonId),
     getLessons(id),
     getUserLessonsForCourse(id),
   ]);

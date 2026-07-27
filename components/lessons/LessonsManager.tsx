@@ -57,7 +57,7 @@ export function LessonsManager({ courseId }: LessonsManagerProps) {
 
   const handleDelete = async () => {
     if (!selectedLesson) return;
-    const result = await deleteLesson(selectedLesson._id);
+    const result = await deleteLesson(courseId, selectedLesson._id);
     if (result.success) {
       toast.success("Lesson deleted successfully");
       setDeleteOpen(false);
