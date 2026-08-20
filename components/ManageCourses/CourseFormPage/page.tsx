@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PageHeader } from "@/components/shared/PageHeader";
-import { CourseForm } from "@/components/forms/CourseForm";
+import { PageHeader } from "@/components/PageHeader/page";
+import CourseForm from "./CourseForm/page";
 import { CourseFormPageProps } from "@/lib/types";
 import {
   CourseFormData,
@@ -115,4 +115,3 @@ export function CourseFormPage({ courseId }: CourseFormPageProps) {
     </div>
   );
 }
-

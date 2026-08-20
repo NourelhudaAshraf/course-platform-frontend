@@ -1,4 +1,4 @@
-import { LessonsManager } from "@/components/lessons/LessonsManager";
+import { LessonsManager } from "@/components/ManageLessons/page";
 
 type LessonsPageProps = {
   params: Promise<{ id: string }>;

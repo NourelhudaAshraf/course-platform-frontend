@@ -5,22 +5,15 @@ import { useState, useEffect } from "react";
 import { Shield, ShieldAlert, Trash2, UserCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { SharedTable } from "../SharedTable/page";
 import { Column, UserProps } from "@/lib/types";
-import { Skeleton } from "../ui/skeleton";
 import { formatDate } from "@/lib/utils";
 import { PaginationC } from "../Pagination/page";
-import { deleteUser, getAllUsers, promoteUser } from "@/actions/users";
+import { getAllUsers } from "@/actions/users";
 import { Avatar, AvatarFallback } from "../ui/avatar";
+import { PageHeader } from "../PageHeader/page";
+import Dialogs from "./Dialogs/page";
 
 export default function ManageUsersPage() {
   const [users, setUsers] = useState<UserProps[]>([]);
@@ -47,36 +40,8 @@ export default function ManageUsersPage() {
     fetchUsers();
   }, [page]);
 
-  const handleDelete = async () => {
-    if (!selectedUser) return;
-
-    const result = await deleteUser(selectedUser._id);
-    if (result.success) {
-      toast.success("User deleted successfully");
-      setSelectedUser(null);
-    } else {
-      toast.error(result.error);
-    }
-    setDeleteDialogOpen(false);
-    await fetchUsers();
-  };
-
   const handlePageChange = (page: number) => {
     setPage(page);
-  };
-
-  const handlePromoteToAdmin = async () => {
-    if (!selectedUser) return;
-
-    const result = await promoteUser(selectedUser._id);
-    if (result.success) {
-      toast.success("User promoted successfully");
-      setSelectedUser(null);
-    } else {
-      toast.error(result.error);
-    }
-    await fetchUsers();
-    setPromoteDialogOpen(false);
   };
 
   const columns: Column<UserProps>[] = [
@@ -136,17 +101,11 @@ export default function ManageUsersPage() {
     {
       key: "status",
       title: "Status",
-      render: (user) => (
+      render: () => (
         <Badge
           variant="outline"
-          className={
-            // user.status === "active"
-            //   ? "bg-green-50 text-green-700 border-green-200"
-            //   : "bg-red-50 text-red-700 border-red-200"
-            "bg-green-50 text-green-700 border-green-200"
-          }
+          className={"bg-green-50 text-green-700 border-green-200"}
         >
-          {/* {user.status === "active" ? "Active" : "Blocked"} */}
           Active
         </Badge>
       ),
@@ -201,16 +160,10 @@ export default function ManageUsersPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-5">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Manage Users</h1>
-            {users?.length ? (
-              <p className="text-gray-500 mt-1">
-                Total {users.length} users in your platform
-              </p>
-            ) : (
-              <Skeleton className="h-4 w-60 mt-3" />
-            )}
-          </div>
+          <PageHeader
+            title="Manage Users"
+            description={`You can manage all users in the platform`}
+          />
         </div>
         <SharedTable
           title="All users"
@@ -230,54 +183,15 @@ export default function ManageUsersPage() {
             onPageChange={handlePageChange}
           />
         )}
-        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Delete User</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to delete &quot; {selectedUser?.name}
-                &quot;? This action cannot be undone.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setDeleteDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={handleDelete}>
-                Delete
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-        <Dialog open={promoteDialogOpen} onOpenChange={setPromoteDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Promote to Admin</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to promote{" "}
-                <span className="font-medium">{selectedUser?.name}</span> to
-                admin? This will give them full access to the admin panel.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setPromoteDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handlePromoteToAdmin}
-                className={"bg-purple-600 hover:bg-purple-700"}
-              >
-                Promote to Admin
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <Dialogs
+          selectedUser={selectedUser}
+          deleteDialogOpen={deleteDialogOpen}
+          setDeleteDialogOpen={setDeleteDialogOpen}
+          promoteDialogOpen={promoteDialogOpen}
+          setPromoteDialogOpen={setPromoteDialogOpen}
+          fetchUsers={fetchUsers}
+          setSelectedUser={setSelectedUser}
+        />
       </div>
     </div>
   );

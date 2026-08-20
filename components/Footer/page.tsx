@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { GraduationCap, Mail, Phone, MapPin } from "lucide-react";
-import { FooterLinks } from "@/lib/types";
+import FooterLink from "./FooterLink/page";
 
 export default function Footer() {
   return (
@@ -30,7 +30,7 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <FooterLink href="/">Home</FooterLink>
-              <FooterLink href="/courses">All Courses</FooterLink>
+              <FooterLink href="/#courses">All Courses</FooterLink>
             </ul>
           </div>
 
@@ -38,8 +38,8 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Support</h3>
             <ul className="space-y-2">
-              <FooterLink href="/privacy">Privacy Policy</FooterLink>
-              <FooterLink href="/terms">Terms of Service</FooterLink>
+              <FooterLink href="/">Privacy Policy</FooterLink>
+              <FooterLink href="/">Terms of Service</FooterLink>
             </ul>
           </div>
 
@@ -77,18 +77,5 @@ export default function Footer() {
         </div>
       </div>
     </footer>
-  );
-}
-
-function FooterLink({ href, children }: FooterLinks) {
-  return (
-    <li>
-      <Link
-        href={href}
-        className="text-gray-300 hover:text-white text-sm transition hover:translate-x-1 inline-block"
-      >
-        {children}
-      </Link>
-    </li>
   );
 }

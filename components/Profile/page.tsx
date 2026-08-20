@@ -17,7 +17,7 @@ import ChangePasswordForm from "./ChangePasswordForm/page";
 import ProfileForm from "./ProfileForm/page";
 import { ProfileFormData } from "@/lib/schemas/profile";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 
 type ProfileTab = "account" | "security";
 
@@ -60,16 +60,6 @@ export default function ProfilePage() {
     return data;
   };
 
-  const getInitials = () => {
-    if (!name) return "U";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -95,7 +85,7 @@ export default function ProfilePage() {
               <Avatar className="h-14 w-14 border-2 border-white shadow-md">
                 <AvatarImage src="" />
                 <AvatarFallback className="bg-linear-to-r from-blue-600 to-purple-600 text-lg text-white">
-                  {getInitials()}
+                  {getInitials(name)}
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0">

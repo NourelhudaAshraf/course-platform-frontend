@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ImageIcon, Loader2, Save, Upload } from "lucide-react";
+import { Loader2, Save, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,19 +13,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { CourseFormComponentProps } from "@/lib/types";
 import {
   courseSchema,
   CourseFormData,
   CourseFormSubmitData,
 } from "@/lib/schemas/course.schema";
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import CourseImagePreview from "./CourseImagePreview/page";
+import FormField from "@/components/FormField/page";
 
 const ACCEPTED_IMAGE_TYPES = "image/jpeg,image/png,image/webp,image/gif";
 
-export function CourseForm({
+export default function CourseForm({
   defaultValues,
   existingImageUrl,
   isEdit = false,
@@ -74,18 +73,14 @@ export function CourseForm({
 
     if (!file) {
       setImageFile(null);
-      setImagePreviewUrl(
-        isEdit && existingImageUrl ? existingImageUrl : null,
-      );
+      setImagePreviewUrl(isEdit && existingImageUrl ? existingImageUrl : null);
       return;
     }
 
     if (!file.type.startsWith("image/")) {
       setImageError("Please select a valid image file");
       setImageFile(null);
-      setImagePreviewUrl(
-        isEdit && existingImageUrl ? existingImageUrl : null,
-      );
+      setImagePreviewUrl(isEdit && existingImageUrl ? existingImageUrl : null);
       return;
     }
 
@@ -221,64 +216,5 @@ export function CourseForm({
         </CardContent>
       </form>
     </Card>
-  );
-}
-
-function CourseImagePreview({ src }: { readonly src: string | null }) {
-  const [loadFailed, setLoadFailed] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-
-  if (!src || loadFailed) {
-    return (
-      <div className="flex h-full min-h-[140px] flex-col items-center justify-center gap-2 px-4 text-center text-gray-400">
-        <ImageIcon className="h-10 w-10 stroke-[1.5]" />
-        <p className="text-sm">
-          {loadFailed
-            ? "Could not load image. Try another file."
-            : "Upload an image to see a preview"}
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <>
-      {!loaded && <Skeleton className="absolute inset-0 h-full w-full" />}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt="Course preview"
-        className={cn(
-          "h-full w-full object-cover transition-opacity duration-300",
-          loaded ? "opacity-100" : "opacity-0",
-        )}
-        onLoad={() => setLoaded(true)}
-        onError={() => setLoadFailed(true)}
-      />
-    </>
-  );
-}
-
-function FormField({
-  id,
-  label,
-  error,
-  required,
-  children,
-}: {
-  readonly id: string;
-  readonly label: string;
-  readonly error?: string;
-  readonly required?: boolean;
-  readonly children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={id} className="text-gray-700">
-        {label} {required && <span className="text-red-500">*</span>}
-      </Label>
-      {children}
-      {error && <p className="text-sm text-red-500">{error}</p>}
-    </div>
   );
 }

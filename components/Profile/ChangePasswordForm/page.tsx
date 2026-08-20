@@ -24,12 +24,14 @@ function PasswordField({
   disabled,
   register,
 }: {
-  id: string;
-  label: string;
-  placeholder: string;
-  error?: string;
-  disabled: boolean;
-  register: ReturnType<typeof useForm<ChangePasswordFormData>>["register"];
+  readonly id: string;
+  readonly label: string;
+  readonly placeholder: string;
+  readonly error?: string;
+  readonly disabled: boolean;
+  readonly register: ReturnType<
+    typeof useForm<ChangePasswordFormData>
+  >["register"];
 }) {
   const [show, setShow] = useState(false);
 

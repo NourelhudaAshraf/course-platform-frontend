@@ -2,7 +2,6 @@ import { getCurrentUser } from "@/actions/auth";
 import Footer from "@/components/Footer/page";
 import Navbar from "@/components/Navbar/page";
 import { UserProps } from "@/lib/types";
-import { redirect } from "next/navigation";
 
 export default async function AdminLayout({
   children,

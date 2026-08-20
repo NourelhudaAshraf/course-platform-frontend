@@ -146,9 +146,9 @@ export type PaginationProps = {
 };
 
 export type CourseDetailsPageProps = {
-  params: {
-    id: string;
-  };
+  readonly params: Promise<{
+    readonly id: string;
+  }>;
 };
 
 export type LectureDetailsPageProps = {

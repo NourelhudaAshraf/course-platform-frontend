@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PageHeader } from "@/components/shared/PageHeader";
-import { LessonForm } from "@/components/forms/LessonForm";
+import { PageHeader } from "@/components/PageHeader/page";
+import { LessonForm } from "@/components/ManageLessons/LessonsFormPage/LessonForm/page";
 import { LessonFormPageProps } from "@/lib/types";
 import {
   LessonFormData,

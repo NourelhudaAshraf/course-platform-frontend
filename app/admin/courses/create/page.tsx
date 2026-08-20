@@ -1,4 +1,4 @@
-import { CourseFormPage } from "@/components/courses/CourseFormPage";
+import { CourseFormPage } from "@/components/ManageCourses/CourseFormPage/page";
 
 export default function CreateCoursePage() {
   return <CourseFormPage />;

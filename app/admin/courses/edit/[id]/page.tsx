@@ -1,4 +1,4 @@
-import { CourseFormPage } from "@/components/courses/CourseFormPage";
+import { CourseFormPage } from "@/components/ManageCourses/CourseFormPage/page";
 
 type EditCoursePageProps = {
   params: Promise<{ id: string }>;

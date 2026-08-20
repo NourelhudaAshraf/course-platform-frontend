@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 type PageHeaderProps = {
   readonly title: string;
-  readonly description?: string;
+  readonly description?: string | ReactNode;
   readonly action?: ReactNode;
 };
 

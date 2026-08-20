@@ -3,16 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Save, Upload, Video } from "lucide-react";
+import { Loader2, Save, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import FormField from "@/components/FormField/page";
 import { LessonFormComponentProps } from "@/lib/types";
 import {
   lessonSchema,
   LessonFormData,
   LessonFormSubmitData,
 } from "@/lib/schemas/lesson.schema";
+import VideoPreview from "./VideoPreview/page";
 
 const ACCEPTED_VIDEO_TYPES = "video/mp4,video/webm,video/ogg,video/quicktime";
 
@@ -153,14 +154,7 @@ export function LessonForm({
           </Button>
         </FormField>
 
-        <div className="rounded-lg border border-dashed border-gray-200 bg-gray-50/80 p-4">
-          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500">
-            Video preview
-          </p>
-          <div className="relative mx-auto aspect-video w-full overflow-hidden rounded-lg border bg-black shadow-sm">
-            <VideoPreview src={previewSrc} />
-          </div>
-        </div>
+        <VideoPreview src={previewSrc} />
       </div>
 
       <FormField
@@ -193,70 +187,5 @@ export function LessonForm({
         )}
       </Button>
     </form>
-  );
-}
-
-function isValidImageUrl(url: string) {
-  if (!url) return false;
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function VideoPreview({ src }: { readonly src: string | null }) {
-  const [loadFailed, setLoadFailed] = useState(false);
-
-  useEffect(() => {
-    setLoadFailed(false);
-  }, [src]);
-
-  if (!src || loadFailed) {
-    return (
-      <div className="flex h-full min-h-[140px] flex-col items-center justify-center gap-2 px-4 text-center text-gray-400">
-        <Video className="h-10 w-10 stroke-[1.5]" />
-        <p className="text-sm">
-          {loadFailed
-            ? "Could not load video. Try another file."
-            : "Upload a video to see a preview"}
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <video
-      key={src}
-      src={src}
-      controls
-      className="h-full w-full object-contain"
-      onError={() => setLoadFailed(true)}
-    />
-  );
-}
-
-function FormField({
-  id,
-  label,
-  error,
-  required,
-  children,
-}: {
-  id: string;
-  label: string;
-  error?: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={id}>
-        {label} {required && <span className="text-red-500">*</span>}
-      </Label>
-      {children}
-      {error && <p className="text-sm text-red-500">{error}</p>}
-    </div>
   );
 }

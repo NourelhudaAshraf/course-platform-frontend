@@ -1,5 +1,5 @@
-import CoursesTable from "@/components/courses/CoursesTable";
+import ManageCoursesPage from "@/components/ManageCourses/page";
 
 export default function CoursesPage() {
-  return <CoursesTable />;
+  return <ManageCoursesPage />;
 }

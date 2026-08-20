@@ -1,7 +1,6 @@
 import { getCurrentUser } from "@/actions/auth";
 import { AdminSidebar } from "@/components/AdminSidebar/page";
 import { UserProps } from "@/lib/types";
-import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 

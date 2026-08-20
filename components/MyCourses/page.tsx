@@ -7,8 +7,7 @@ import { useEffect, useState } from "react";
 import { EnrollProps } from "@/lib/types";
 import { getEnrolledCourses } from "@/actions/enroll";
 import { toast } from "sonner";
-import { ChevronRight, Sparkles } from "lucide-react";
-import { Badge } from "../ui/badge";
+import { ChevronRight } from "lucide-react";
 import { Button } from "../ui/button";
 import Link from "next/link";
 

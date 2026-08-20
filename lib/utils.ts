@@ -21,3 +21,13 @@ export const formatDate = (date: string) => {
     day: "numeric",
   });
 };
+
+export const getInitials = (userName: string) => {
+  if (!userName) return "U";
+  return userName
+    .split(" ")
+    .map((n: string) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+};

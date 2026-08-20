@@ -13,8 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { SharedTable } from "@/components/shared/SharedTable";
-import { PageHeader } from "@/components/shared/PageHeader";
+import { SharedTable } from "@/components/SharedTable/page";
+import { PageHeader } from "@/components/PageHeader/page";
 import { deleteLesson } from "@/actions/lessons/deleteLesson";
 import { getLessons } from "@/actions/lessons/getLessons";
 import { getCourse as getCourseData } from "@/actions/courses/getCourse";
@@ -140,7 +140,6 @@ export function LessonsManager({ courseId }: LessonsManagerProps) {
           </Button>
         }
       />
-
       <SharedTable
         title="Course Lessons"
         description="All lessons for this course"
@@ -152,7 +151,6 @@ export function LessonsManager({ courseId }: LessonsManagerProps) {
         skeletonRows={4}
         skeletonColumns={4}
       />
-
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>
           <DialogHeader>

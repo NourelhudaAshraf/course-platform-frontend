@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { SharedTable } from "@/components/shared/SharedTable";
-import { PageHeader } from "@/components/shared/PageHeader";
+import { SharedTable } from "@/components/SharedTable/page";
+import { PageHeader } from "@/components/PageHeader/page";
 import { getEnrollments } from "@/actions/payments/getEnrollments";
 import { Column, PaymentProps } from "@/lib/types";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -64,7 +64,7 @@ export default function PaymentsPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6 mt-5 md:mt-0">
       <PageHeader
         title="Manage Payments"
-        description="View all course enrollments and payments"
+        description={`You can manage all payments`}
       />
       <SharedTable
         title="Enrollment Payments"
